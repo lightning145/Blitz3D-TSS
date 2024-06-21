@@ -1409,7 +1409,7 @@ Entity* bbCreateListener(Entity* p, float roll, float dopp, float dist) {
 	return insertEntity(listener, p);
 }
 
-gxChannel* bbEmitSound(gxSound* sound, Object* o) {
+Channel bbEmitSound(Sound* sound, Object* o) {
 	debugObject(o, "CreateListener");
 	if (!listener) ErrorLog("CreateListener", MultiLang::no_listener_created);
 	return o->emitSound(sound);

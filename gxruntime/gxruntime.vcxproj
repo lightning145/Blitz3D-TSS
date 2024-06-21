@@ -142,7 +142,6 @@
   <ItemGroup>
     <ClCompile Include="ddutil.cpp" />
     <ClCompile Include="gxfont.cpp" />
-    <ClCompile Include="gxaudio.cpp" />
     <ClCompile Include="gxcanvas.cpp" />
     <ClCompile Include="gxchannel.cpp" />
     <ClCompile Include="gxdevice.cpp" />
@@ -157,7 +156,6 @@
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <ClCompile Include="gxscene.cpp" />
-    <ClCompile Include="gxsound.cpp" />
     <ClCompile Include="gxtimer.cpp" />
     <ClCompile Include="gxutf8.cpp" />
     <ClCompile Include="std.cpp">
@@ -171,7 +169,6 @@
     <ClInclude Include="asmcoder.h" />
     <ClInclude Include="ddutil.h" />
     <ClInclude Include="gxfont.h" />
-    <ClInclude Include="gxaudio.h" />
     <ClInclude Include="gxcanvas.h" />
     <ClInclude Include="gxchannel.h" />
     <ClInclude Include="gxdevice.h" />
@@ -184,7 +181,6 @@
     <ClInclude Include="gxmovie.h" />
     <ClInclude Include="gxruntime.h" />
     <ClInclude Include="gxscene.h" />
-    <ClInclude Include="gxsound.h" />
     <ClInclude Include="gxtimer.h" />
     <ClInclude Include="gxutf8.h" />
     <ClInclude Include="std.h" />
