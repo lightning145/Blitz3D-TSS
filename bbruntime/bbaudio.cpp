@@ -1,154 +1,201 @@
 #include "std.h"
 #include "bbaudio.h"
-#include "../soloud/soloud.h"
-#include "../soloud/soloud_wav.h"
+
 #include "../MultiLang/MultiLang.h"
+#include "../soloud/soloud_wav.h"
 #include "../soloud/soloud_wavstream.h"
 
-std::set<Sound*> sounds;
-SoLoud::Soloud* soloud;
+gxAudio* gx_audio;
 
-static inline void debugSound(gxSound* s, const char* function) {
-	if (!gx_audio->verifySound(s)) ErrorLog(function, MultiLang::sound_not_exist);
-}
+set<gxAudio::Sound*> sounds;
+set<gxChannel*> channels;
 
-int bbVerifySound(Sound* sound) {
+bool bbVerifySound(gxAudio::Sound* sound) {
     return sounds.contains(sound);
 }
 
-Sound* bbLoadSound(BBStr* f) {
-    SoLoud::Wav* wav = new SoLoud::Wav();
-    SoLoud::result r = wav->load(f->c_str());
-    delete f;
-    return r == SoLoud::SO_NO_ERROR ? new Sound(wav) : nullptr;
+bool bbVerifyChannel(gxChannel* channel) {
+    return channels.contains(channel);
 }
 
-Sound* bbLoad3DSound(BBStr* f) {
-    return bbLoadSound(f);
+static void debugSound(gxAudio::Sound* s, const char* function) {
+    if (!sounds.contains(s)) ErrorLog(function, MultiLang::sound_not_exist)
 }
 
-void bbFreeSound(Sound* sound) {
-    if (!sound) return;
+static void debugChannel(gxChannel* channel, const char* function) {
+    if (!channels.contains(channel)) ErrorLog(function, MultiLang::sound_not_exist)
+}
+
+gxAudio::Sound* bbLoadSound(const BBStr* path) {
+    gxAudio::Sound* sound = gx_audio->loadSound(path->c_str());
+
+    if (sound != nullptr) {
+        sounds.insert(sound);
+    }
+
+    delete path;
+    return sound;
+}
+
+void bbFreeSound(gxAudio::Sound* sound) {
+    if (!bbVerifySound(sound)) return;
+
+    sounds.erase(sound);
+
     delete sound;
 }
 
-void bbLoopSound(Sound* sound) {
+void bbLoopSound(gxAudio::Sound* sound) {
     if (!sound) return;
+
     debugSound(sound, "LoopSound");
-    sound->wav->setLooping(true);
+
+    sound->source->setLooping(true);
 }
 
-void bbSoundPitch(Sound* sound, int pitch) {
+void bbSoundVolume(gxAudio::Sound* sound, const float volume) {
     if (!sound) return;
-    debugSound(sound, "SoundPitch");
-    sound->pitch = pitch;
-}
 
-void bbSoundVolume(Sound* sound, float volume) {
-    if (!sound) return;
     debugSound(sound, "SoundVolume");
-    sound->volume = volume;
+
+    sound->source->setVolume(volume);
 }
 
-void bbSoundPan(Sound* sound, float pan) {
+void bbSoundPan(gxAudio::Sound* sound, const float pan) {
     if (!sound) return;
+
     debugSound(sound, "SoundPan");
+
     sound->pan = pan;
 }
 
-uint32_t bbPlaySound(Sound* sound) {
-    if (!sound) return 0;
+void bbSoundPitch(gxAudio::Sound* sound, const int pitch) {
+    if (!sound) return;
+
+    debugSound(sound, "SoundPitch");
+
+    sound->pitch = pitch;
+}
+
+gxChannel* bbPlaySound(gxAudio::Sound* sound) {
+    if (!sound) return nullptr;
+
     debugSound(sound, "PlaySound");
-    return sound->play();
+
+    gxChannel* channel = gx_audio->playSound(*sound);
+
+    if (channel != nullptr) {
+        channels.insert(channel);
+    }
+
+    return channel;
 }
 
-Channel bbPlayMusic(BBStr* f) {
-    SoLoud::WavStream wavStream;
-    SoLoud::result r = wavStream.load(f->c_str());
-    delete f;
-    return r == SoLoud::SO_NO_ERROR ? soloud->play(wavStream) : 0;
+gxChannel* bbPlayMusic(const BBStr* path) {
+    gxChannel* channel = gx_audio->playMusic(path->c_str());
+
+    if (channel != nullptr) {
+        channels.insert(channel);
+    }
+
+    return channel;
 }
 
-//Channel bbPlayCDTrack(int track, int mode) {
-//	return gx_audio ? gx_audio->playCDTrack(track, mode) : 0;
-//}
+void bbStopChannel(gxChannel* channel) {
+    if (!channel || !bbVerifyChannel(channel)) return;
 
-void bbStopChannel(Channel channel) {
+    channel->stop();
+    channels.erase(channel);
+
+    delete channel;
+}
+
+void bbPauseChannel(gxChannel* channel) {
     if (!channel) return;
-    soloud->stop(channel);
+
+    debugChannel(channel, "PauseChannel");
+
+    channel->setPaused(true);
 }
 
-void bbPauseChannel(Channel channel) {
+void bbResumeChannel(gxChannel* channel) {
     if (!channel) return;
-    soloud->setPause(channel, true);
+
+    debugChannel(channel, "ResumeChannel");
+
+    channel->setPaused(false);
 }
 
-void bbResumeChannel(Channel channel) {
+void bbChannelVolume(gxChannel* channel, const float volume) {
     if (!channel) return;
-    soloud->setPause(channel, false);
+
+    debugChannel(channel, "ChannelVolume");
+
+    channel->setVolume(volume);
 }
 
-void bbChannelPitch(Channel channel, int pitch) {
+void bbChannelPan(gxChannel* channel, const float pan) {
     if (!channel) return;
-    soloud->setSamplerate(channel, (float) pitch);
+
+    debugChannel(channel, "ChannelPan");
+
+    channel->setPan(pan);
 }
 
-void bbChannelVolume(Channel channel, float volume) {
+void bbChannelPitch(gxChannel* channel, const int pitch) {
     if (!channel) return;
-    soloud->setVolume(channel, volume);
+
+    debugChannel(channel, "ChannelPitch");
+
+    channel->setPitch(pitch);
 }
 
-void bbChannelPan(Channel channel, float pan) {
-    if (!channel) return;
-    soloud->setPan(channel, pan);
+bool bbChannelPlaying(gxChannel* channel) {
+    return bbVerifyChannel(channel) && channel->isPlaying();
 }
 
-int bbChannelPlaying(Channel channel) {
-    return soloud->isValidVoiceHandle(channel);
-}
+gxChannel* bbPlay3dSound(gxAudio::Sound* sound, const float x, const float y, const float z, const float vx, const float vy, const float vz) {
+    if (!sound) return nullptr;
 
-Channel bbPlay3dSound(Sound* sound, float x, float y, float z, float vx, float vy, float vz) {
-    if (!sound) return 0;
     debugSound(sound, "Play3dSound");
-    auto sc = distanceFactor;
-    return sound->play3d(x * sc, y * sc, z * sc, vx * sc, vy * sc, vz * sc);
+
+    gxChannel* channel = gx_audio->play3dSound(*sound, x, y, z, vx, vy, vz);
+
+    if (channel != nullptr) {
+        channels.insert(channel);
+    }
+
+    return channel;
 }
 
-void bbSet3dChannel(Channel channel, float x, float y, float z, float vx, float vy, float vz) {
+void bbSet3dChannel(gxChannel* channel, const float x, const float y, const float z, const float vx, const float vy, const float vz) {
     if (!channel) return;
-    auto sc = distanceFactor;
-    soloud->set3dSourceParameters(channel, x * sc, y * sc, z * sc, vx * sc, vy * sc, vz * sc);
+
+    debugChannel(channel, "Set3dChannel");
+
+    gx_audio->set3dChannel(channel, x, y, z, vx, vy, vz);
 }
 
-void bbSet3dListenerConfig(float roll, float dopp, float dist) {
-    if (!soloud) return;
-    rolloffFactor = roll;
-    dopplerFactor = dopp;
-    distanceFactor = dist;
+void bbSet3dListenerConfig(const float roll, const float dopp, const float dist) {
+    gx_audio->set3dListenerConfig(roll, dopp, dist);
 }
 
-void bbSet3dListener(float x, float y, float z, float kx, float ky, float kz, float jx, float jy, float jz, float vx,
-    float vy, float vz) {
-    if (!soloud) return;
-    auto sc = distanceFactor;
-    soloud->set3dListenerParameters(x * sc, y * sc, z * sc, kx, ky, kz, jy, jy, jz, vx * sc, vy * sc, vz * sc);
-    soloud->update3dAudio();
+void bbSet3dListener(const float x, const float y, const float z, const float kx, const float ky, const float kz, const float jx, const float jy, const float jz, const float vx,
+    const float vy, const float vz) {
+    gx_audio->set3dListener(x, y, z, kx, ky, kz, jx, jy, jz, vx, vy, vz);
 }
 
 bool audio_create() {
-    soloud = new SoLoud::Soloud();
-    if (soloud->init() != SoLoud::SO_NO_ERROR) {
-        delete soloud;
-        soloud = nullptr;
-    }
+    gx_audio = new gxAudio();
+
     return true;
 }
 
 bool audio_destroy() {
-    if (!soloud) return true;
-    soloud->deinit();
-    delete soloud;
-    soloud = nullptr;
+    if (!gx_audio) return true;
+
+    delete gx_audio;
+
     return true;
 }
 
@@ -170,5 +217,5 @@ void audio_link(void(*rtSym)(const char*, void*)) {
     rtSym("ChannelVolume%channel#volume", bbChannelVolume);
     rtSym("ChannelPan%channel#pan", bbChannelPan);
     rtSym("%ChannelPlaying%channel", bbChannelPlaying);
-    rtSym("%Load3DSound$filename", bbLoad3DSound);
+    rtSym("%Load3DSound$filename", bbLoadSound);
 }
