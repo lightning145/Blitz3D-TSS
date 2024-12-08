@@ -26,7 +26,7 @@ BBStr* bbRight(BBStr* s, int n) {
 }
 
 BBStr* bbReplace(BBStr* s, BBStr* from, BBStr* to) {
-	std::string str = UTF8::replaceAll(s->c_str(), from->c_str(), to->c_str());
+	std::string&& str = UTF8::replaceAll(s->c_str(), from->c_str(), to->c_str());
 	delete s; delete from; delete to;
 	return new BBStr(str);
 }
@@ -123,6 +123,12 @@ int bbLen(BBStr* s) {
 	delete s; return n;
 }
 
+BBStr* bbHighPrecisionFloatString(float f) {
+	std::ostringstream stream;
+	stream << std::setprecision(20) << f;
+	return new BBStr(stream.str());
+}
+
 BBStr* bbCurrentDate() {
 	time_t t;
 	time(&t);
@@ -165,6 +171,7 @@ void string_link(void(*rtSym)(const char*, void*)) {
 	rtSym("%Len$string", bbLen);
 	rtSym("$Hex%value", bbHex);
 	rtSym("$Bin%value", bbBin);
+	rtSym("$HighPrecisionFloatString#value", bbHighPrecisionFloatString);
 	rtSym("$CurrentDate", bbCurrentDate);
 	rtSym("$CurrentTime", bbCurrentTime);
 }

@@ -25,6 +25,6 @@ public:
 	virtual int eof() = 0;
 };
 
-void debugStream(bbStream* s, std::string function);
+void debugStream(bbStream* s, const char* function);
 
 #endif

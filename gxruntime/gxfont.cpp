@@ -4,20 +4,27 @@
 #include "gxcanvas.h"
 #include "gxgraphics.h"
 #include "gxutf8.h"
+#include "../bbruntime/bbsys.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <freetype/ftsynth.h>
 
-gxFont::gxFont(FT_Library ftLibrary, gxGraphics* gfx, const std::string& fn, int h) {
+gxFont::gxFont(FT_Library ftLibrary, gxGraphics* gfx, const std::string& fn, int h, bool bold, bool italic, bool underlined) {
 	graphics = gfx;
 	filename = fn;
 	height = h;
+	this->bold = bold;
+	this->italic = italic;
+	this->underlined = underlined;
 
-	FT_New_Face(ftLibrary,
+	if (FT_New_Face(ftLibrary,
 		filename.c_str(),
 		0,
-		&freeTypeFace);
+		&freeTypeFace)) {
+		RTEX(std::format("Failed to load file: {}", fn).c_str());
+	}
 
 	FT_Set_Pixel_Sizes(freeTypeFace,
 		0,
@@ -72,6 +79,16 @@ void gxFont::renderAtlas(int chr) {
 				(FT_UInt)glyphIndex,
 				FT_LOAD_TARGET_MONO);
 			if(glyphIndex != 0) {
+				if (bold)
+				{
+					FT_GlyphSlot_Embolden(freeTypeFace->glyph);
+				}
+
+				if (italic)
+				{
+					FT_GlyphSlot_Oblique(freeTypeFace->glyph);
+				}
+
 				FT_Render_Glyph(freeTypeFace->glyph,
 					FT_RENDER_MODE_MONO);
 				unsigned char* glyphBuffer = freeTypeFace->glyph->bitmap.buffer;
@@ -193,6 +210,11 @@ void gxFont::render(gxCanvas* dest, unsigned color_argb, int x, int y, const std
 		i += codepointLen;
 	}
 
+	if (underlined)
+	{
+		tempCanvas->rect(0, static_cast<int>(getBaselinePosition() + getUnderlinePosition()), width, max(1, static_cast<int>(getUnderlineThickness())), true);
+	}
+
 	dest->blit(x, y - glyphRenderOffset, tempCanvas, 0, 0, width, tCanvasHeight, false);
 }
 
@@ -253,4 +275,19 @@ int gxFont::getWidth(const std::string& text) {
 
 bool gxFont::isPrintable(int chr)const {
 	return glyphData.find(chr) != glyphData.end();
+}
+
+float gxFont::getBaselinePosition() const
+{
+	return static_cast<float>(freeTypeFace->size->metrics.ascender) / 64.0F;
+}
+
+float gxFont::getUnderlinePosition()const
+{
+	return -static_cast<float>(FT_MulFix(freeTypeFace->underline_position, freeTypeFace->size->metrics.y_scale)) / 64.0F;
+}
+
+float gxFont::getUnderlineThickness()const
+{
+	return std::max(1.0F, static_cast<float>(FT_MulFix(freeTypeFace->underline_thickness, freeTypeFace->size->metrics.y_scale)) / 64.0F);
 }

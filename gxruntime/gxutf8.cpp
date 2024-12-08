@@ -191,16 +191,22 @@ std::wstring UTF8::convertToUtf16(const std::string& str) {
 	return result;
 }
 
-std::string UTF8::replaceAll(const std::string& string, const std::string& pattern, const std::string& newpat) {
-	std::string str = string;
-	const unsigned nsize = newpat.size();
-	const unsigned psize = pattern.size();
+std::string UTF8::replaceAll(const std::string_view& str, const std::string_view& pattern, const std::string_view& newpat) {
+	std::string result;
+	result.reserve(str.size());
 
-	for (unsigned pos = str.find(pattern, 0); pos != std::string::npos; pos = str.find(pattern, pos + nsize))
-	{
-		str = str.replace(pos, psize, newpat);
+	size_t pos = 0;
+	size_t prev_pos = 0;
+
+	while ((pos = str.find(pattern, pos)) != std::string::npos) {
+		result.append(str.substr(prev_pos, pos - prev_pos));
+		result.append(newpat);
+		pos += pattern.size();
+		prev_pos = pos;
 	}
-	return str;
+
+	result.append(str.substr(prev_pos));
+	return result;
 }
 
 std::string UTF8::getSystemFontFile(const std::string& faceName) {

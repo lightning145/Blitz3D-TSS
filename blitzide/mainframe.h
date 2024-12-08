@@ -55,7 +55,6 @@ public:
 	afx_msg void helpAutodoc();
 	afx_msg void helpBack();
 	afx_msg void helpForward();
-	afx_msg void openIni();
 	afx_msg void helpAbout();
 
 	afx_msg void updateCmdUI( CCmdUI *ui );

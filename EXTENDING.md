@@ -51,6 +51,33 @@ Now HERE is how we would write a DLL:
 
 **ATTENTION!** When building a standalone executable for your game, you must place the userlib's DLL alongside the executable (you don't need the declarations file anymore, though).
 
+### Throwing exceptions in DLLs
+
+> [!IMPORTANT]
+> This feature is available in Blitz3D TSS v1.334 or above only. Other Blitz3D or BlitzPlus will occur "Unknown runtime exception", no matter what type of exception you threw.
+
+Blitz3D TSS is using [Structured Exception Handling](https://learn.microsoft.com/en-us/windows/win32/debug/about-structured-exception-handling) to receive your exceptions. There are two types of exceptions are available for throwing:
+
+* `0xE0000001` : Throwing a runtime error and crashing the program immediately. Requires runtime error message.
+* `0xE0000002` : Throwing an exception which can be shown in the customized MAV message. Requires function name and exception message.
+
+To throw exceptions in DLLs, you need to use [RaiseException function](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-raiseexception).
+
+For example:
+```cpp
+ULONG_PTR args[1]{};
+args[0] = reinterpret_cast<ULONG_PTR>("This is a runtime error!");
+RaiseException(0xE0000001, 0, 1, args);
+```
+```cpp
+ULONG_PTR args[2]{};
+args[0] = reinterpret_cast<ULONG_PTR>("Function name");
+args[1] = reinterpret_cast<ULONG_PTR>("Exception message");
+RaiseException(0xE0000002, 0, 2, args);
+```
+
+**ATTENTION!** Make sure that your `const char*` is pointing to the memory which is still available after your function ends.
+
 ## Sample Code
 
 **MyLib.h**
@@ -67,6 +94,8 @@ Now HERE is how we would write a DLL:
 
 BLITZ3D(float) VecDistance(float x1, float y1, float z1, float x2, float y2, float z2);
 BLITZ3D(const char*) Ping();
+BLITZ3D(void) ErrorFunction();
+BLITZ3D(void) MyExceptionFunction();
 ```
 
 **MyLib.cpp**
@@ -87,6 +116,22 @@ BLITZ3D(const char*) Ping()
 {
     return "Pong";
 }
+
+BLITZ3D(void) ErrorFunction()
+{
+    ULONG_PTR args[1]{};
+    args[0] = reinterpret_cast<ULONG_PTR>("This is a runtime error!");
+    RaiseException(0xE0000001, 0, 1, args);
+}
+
+
+BLITZ3D(void) MyExceptionFunction()
+{
+    ULONG_PTR args[2]{};
+    args[0] = reinterpret_cast<ULONG_PTR>("MyExceptionFunction");
+    args[1] = reinterpret_cast<ULONG_PTR>("Hello world!");
+    RaiseException(0xE0000002, 0, 2, args);
+}
 ```
 
 **MyLib.decls**
@@ -96,8 +141,10 @@ BLITZ3D(const char*) Ping()
 
 VecDistance#(x1#, y1#, z1#, x2#, y2#, z2#):"_VecDistance@24"
 Ping$():"_Ping@0"
+ErrorFunction():"_ErrorFunction@0"
+MyExceptionFunction():"_MyExceptionFunction@0"
 ```
 
 Hopefully this guide will help you.
 
-If you find any issues with this guide, please open an issue or contact Nora#6365 on the TSS discord server.
+If you find any issues with this guide, please open an issue.

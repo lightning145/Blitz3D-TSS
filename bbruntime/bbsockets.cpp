@@ -5,7 +5,7 @@
 #include "../MultiLang/MultiLang.h"
 #include "../gxruntime/gxutf8.h"
 
-#pragma comment (lib, "wininet.lib")
+#pragma comment (lib, "Urlmon.lib")
 #pragma comment (lib, "Dnsapi.lib")
 static bool socks_ok;
 static WSADATA wsadata;
@@ -276,19 +276,19 @@ void TCPServer::remove(TCPStream* s) {
 	accepted_set.erase(s);
 }
 
-static inline void debugUDPStream(UDPStream* p, std::string function) {
+static inline void debugUDPStream(UDPStream* p, const char* function) {
 	if (!udp_set.count(p)) {
 		ErrorLog(function, MultiLang::udp_stream_not_exist);
 	}
 }
 
-static inline void debugTCPStream(TCPStream* p, std::string function) {
+static inline void debugTCPStream(TCPStream* p, const char* function) {
 	if (!tcp_set.count(p)) {
 		ErrorLog(function, MultiLang::tcp_stream_not_exist);
 	}
 }
 
-static inline void debugTCPServer(TCPServer* p, std::string function) {
+static inline void debugTCPServer(TCPServer* p, const char* function) {
 	if (!server_set.count(p)) {
 		ErrorLog(function, MultiLang::tcp_server_not_exist);
 	}
@@ -504,34 +504,10 @@ bool sockets_destroy() {
 	return true;
 }
 
-void bbDownloadFile(BBStr* url, BBStr* file) {
-	/* https://blog.csdn.net/HW140701/article/details/78207490 */
-	byte Temp[1024];
-	ULONG Number = 1;
-
-	FILE* stream;
-	HINTERNET hSession = InternetOpen("RookIE/1.0", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-	if (hSession != NULL)
-	{
-		HINTERNET handle2 = InternetOpenUrl(hSession, url->c_str(), NULL, 0, INTERNET_FLAG_DONT_CACHE, 0);
-		if (handle2 != NULL)
-		{
-			if ((stream = fopen(file->c_str(), "wb")) != NULL)
-			{
-				while (Number > 0)
-				{
-					InternetReadFile(handle2, Temp, 1024 - 1, &Number);
-					fwrite(Temp, sizeof(char), Number, stream);
-				}
-				fclose(stream);
-			}
-			InternetCloseHandle(handle2);
-			handle2 = NULL;
-		}
-		InternetCloseHandle(hSession);
-		hSession = NULL;
-	}
+int bbDownloadFile(BBStr* url, BBStr* file) {
+	HRESULT result = URLDownloadToFileA(NULL, url->c_str(), file->c_str(), NULL, NULL);
 	delete url; delete file;
+	return result;
 }
 
 void sockets_link(void(*rtSym)(const char*, void*)) {
@@ -561,5 +537,5 @@ void sockets_link(void(*rtSym)(const char*, void*)) {
 	rtSym("$GetDomainTXT$domain", bbGetDomainTXT);
 	rtSym("$ParseDomainTXT$txt$name", bbParseDomainTXT);
 
-	rtSym("DownloadFile$url$file", bbDownloadFile);
+	rtSym("%DownloadFile$url$file", bbDownloadFile);
 }

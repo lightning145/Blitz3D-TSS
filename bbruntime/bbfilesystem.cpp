@@ -30,13 +30,13 @@ struct bbFile : public bbStream {
 
 static std::set<bbFile*> file_set;
 
-static inline void debugFile(bbFile* f, std::string function) {
+static inline void debugFile(bbFile* f, const char* function) {
 	if (!file_set.count(f)) {
 		ErrorLog(function, MultiLang::file_not_exist);
 	}
 }
 
-static inline void debugDir(gxDir* d, std::string function) {
+static inline void debugDir(gxDir* d, const char* function) {
 	if (!gx_filesys->verifyDir(d)) {
 		ErrorLog(function, MultiLang::directory_not_exist);
 	}

@@ -28,36 +28,46 @@ Decl* DeclSeq::findDecl(const std::string& s) {
 }
 
 Decl* DeclSeq::findDecl(const std::string& s, int params) {
-    if (FuncOverrideMapper.contains(s)) {
-        std::string d = "";
-        Decl* decl = this->findDecl(s);
-        if (decl->type->funcType()->params->size() == params) return decl;
-        std::for_each(FuncOverrideMapper[s].begin(), FuncOverrideMapper[s].end(), [this, params, &d](std::tuple<std::string, int, int> func) {
-            if (std::get<1>(func) == params) 
-                return this->findDecl(std::get<0>(func));
-            if ((std::get<1>(func) + std::get<2>(func)) >= params) 
-                d = std::get<0>(func);
-            });
-        return this->findDecl(d);
+    Decl* decl = this->findDecl(s);
+    if (OverrideFunctionMap.contains(s)) {
+        if ((decl != 0) && (decl->type->funcType()->params->size() == params)) return decl;
+        std::string&& d = "";
+        std::vector<OverrideFunction>::iterator it;
+        for (it = OverrideFunctionMap[s].begin(); it != OverrideFunctionMap[s].end(); ++it)
+        {
+            // find the matchest function
+            OverrideFunction& func = *it;
+            if ((func.requiredParameters + func.optionalParameters) == params) {
+                return this->findDecl(func.name);
+            }
+            if (func.requiredParameters == params) {
+                return this->findDecl(func.name);
+            }
+            if ((func.requiredParameters < params) && ((func.requiredParameters + func.optionalParameters) >= params)) {
+                d = func.name;
+            }
+        }
+        if (d != "") return this->findDecl(d);
     }
-    return this->findDecl(s);
+    return decl;
 }
 
 Decl* DeclSeq::insertDecl(const std::string& s, Type* t, int kind, ConstType* d) {
     if (kind & DECL_FUNC) {
         FuncType* func = t->funcType();
-        if (Decl* d1 = findDecl(s)) {
+        if (Decl* d1 = findDecl(s)) { // found duplicate!
             if (d1->type->funcType()->params->size() == func->params->size()) return 0;
-            const std::string newFuncName = "blitz_"s + s + to_string(FuncOverrideMapper[s].size());
-            const int paramNoDefVal = std::count_if(func->params->decls.begin(), func->params->decls.end(), [](Decl* d) {
+            const std::string uniqueFunctionName = "blitz_"s + s + to_string(OverrideFunctionMap[s].size());
+            const int requiredParameters = std::count_if(func->params->decls.begin(), func->params->decls.end(), [](Decl* d) {
                 return d->defType == 0;
                 });
-
-            if (std::count_if(FuncOverrideMapper[s].begin(), FuncOverrideMapper[s].end(), [func](auto tuple) {
-                return std::get<1>(tuple) + std::get<2>(tuple) == func->params->size();
-                }))return 0;
-            Decl* decl = new Decl(newFuncName, t, kind, d);
-            FuncOverrideMapper[s].push_back(std::make_tuple(newFuncName, paramNoDefVal, func->params->size() - paramNoDefVal));
+            if (std::count_if(OverrideFunctionMap[s].begin(), OverrideFunctionMap[s].end(), [func](OverrideFunction& function) {
+                return (function.requiredParameters + function.optionalParameters) == func->params->size();
+                })) {
+                return 0;
+            }
+            Decl* decl = new Decl(uniqueFunctionName, t, kind, d);
+            OverrideFunctionMap[s].push_back(OverrideFunction(uniqueFunctionName, requiredParameters, func->params->size() - requiredParameters));
             decls.push_back(decl);
             return decls.back();
         }

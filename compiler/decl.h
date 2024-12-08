@@ -6,8 +6,13 @@ enum {
 	DECL_GLOBAL = 8, DECL_LOCAL = 16, DECL_PARAM = 32, DECL_FIELD = 64		//ARE vars
 };
 
-// [FuncName, [UniqueFuncOverName, ParamNoDefVal, ParamWithDefVal]]
-static std::map<std::string, std::vector<std::tuple<std::string, int, int>>> FuncOverrideMapper;
+struct OverrideFunction {
+	std::string name;
+	int requiredParameters;
+	int optionalParameters;
+};
+
+static std::map<std::string, std::vector<OverrideFunction>> OverrideFunctionMap;
 
 struct Type;
 struct ConstType;

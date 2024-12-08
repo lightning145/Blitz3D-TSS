@@ -32,6 +32,8 @@ public:
 
 	FT_Library ftLibrary;
 
+	bool running_on_wine;
+
 	gxGraphics(gxRuntime* runtime, IDirectDraw7* dirDraw, IDirectDrawSurface7* front, IDirectDrawSurface7* back, bool d3d);
 	~gxGraphics();
 
@@ -101,7 +103,7 @@ public:
 	gxMovie* verifyMovie(gxMovie* movie);
 	void closeMovie(gxMovie* movie);
 
-	gxFont* loadFont(std::string font, int height);
+	gxFont* loadFont(std::string font, int height, bool bold = false, bool italic = false, bool underlined = false);
 	gxFont* verifyFont(gxFont* font);
 	void freeFont(gxFont* font);
 

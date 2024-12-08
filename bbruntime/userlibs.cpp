@@ -14,21 +14,23 @@ struct Str {
 
 static Str _strs[256];
 static int _nextStr;
+static std::string libFile;
+static std::string funcName;
 
 static void libNotFound() {
-	RTEX(MultiLang::userlib_not_found);
+	RTEX(std::format(MultiLang::userlib_not_found, libFile).c_str());
 }
 
 static void procNotFound() {
-	RTEX(MultiLang::userlib_function_not_found);
+	RTEX(std::format(MultiLang::userlib_function_not_found, funcName).c_str());
 }
 
 void _bbLoadLibs(char* p) {
 
 	std::string home;
 
+	libFile = p;
 	if (const char* t = getenv("blitzpath")) home = t;
-
 	while (*p) {
 		HMODULE mod = LoadLibrary(p);
 		if (!mod && home.size()) {
@@ -38,6 +40,7 @@ void _bbLoadLibs(char* p) {
 		if (mod) {
 			_mods.push_back(mod);
 			while (*p) {
+				funcName = p;
 				void* proc = GetProcAddress(mod, p);
 				p += strlen(p) + 1;
 				void* ptr = *(void**)p;

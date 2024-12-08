@@ -179,7 +179,7 @@ void _bbVecFree(void* vec, BBVecType* type) {
 	bbFree(vec);
 }
 
-void _bbVecBoundsEx(std::string function) {
+void _bbVecBoundsEx(const char* function) {
 	ErrorLog(function, MultiLang::array_bounds_ex);
 }
 
@@ -215,7 +215,7 @@ void _bbDimArray(BBArray* array) {
 	memset(array->data, 0, size * 4);
 }
 
-void _bbArrayBoundsEx(std::string function) {
+void _bbArrayBoundsEx(const char* function) {
 	ErrorLog(function, MultiLang::array_index_out_of_bounds);
 }
 
@@ -478,7 +478,7 @@ BBObj* _bbObjFromHandle(int handle, BBObjType* type) {
 	return obj->type == type ? obj : 0;
 }
 
-void _bbNullObjEx(std::string function) {
+void _bbNullObjEx(const char* function) {
 	ErrorLog(function, MultiLang::null_obj_ex);
 }
 
@@ -528,10 +528,6 @@ void bbRuntimeStats() {
 	gx_runtime->debugLog(std::format(MultiLang::stats_strings, stringCnt).c_str());
 	gx_runtime->debugLog(std::format(MultiLang::stats_objects, objCnt).c_str());
 	gx_runtime->debugLog(std::format(MultiLang::stats_unreleased, unrelObjCnt).c_str());
-}
-
-void bbMav() {
-	bbruntime_panic(MultiLang::memory_access_violation);
 }
 
 bool basic_create() {

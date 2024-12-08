@@ -104,11 +104,11 @@ BBStr* _bbStrConst(const char* s);
 
 void	 _bbDimArray(BBArray* array);
 void	 _bbUndimArray(BBArray* array);
-void	 _bbArrayBoundsEx(std::string function);
+void	 _bbArrayBoundsEx(const char* function);
 
 void* _bbVecAlloc(BBVecType* type);
 void	 _bbVecFree(void* vec, BBVecType* type);
-void	 _bbVecBoundsEx(std::string function);
+void	 _bbVecBoundsEx(const char* function);
 
 BBObj* _bbObjNew(BBObjType* t);
 void	 _bbObjDelete(BBObj* obj);
@@ -127,7 +127,7 @@ int		 _bbObjCompare(BBObj* o1, BBObj* o2);
 BBStr* _bbObjToStr(BBObj* obj);
 int		 _bbObjToHandle(BBObj* obj);
 BBObj* _bbObjFromHandle(int handle, BBObjType* type);
-void	 _bbNullObjEx(std::string function);
+void	 _bbNullObjEx(const char* function);
 
 void	 _bbRestore(BBData* data);
 int		 _bbReadInt();

@@ -154,8 +154,8 @@ void ExprSeqNode::castTo(Type* t, Environ* e) {
 ExprNode* CallNode::semant(Environ* e) {
 	Type* t = e->findType(tag);
 	sem_decl = e->findFunc(ident, exprs->size());
-	ident = sem_decl->name;
 	if(!sem_decl || !(sem_decl->kind & DECL_FUNC)) ex(std::format(MultiLang::function_not_found, ident));
+	ident = sem_decl->name;
 	FuncType* f = sem_decl->type->funcType();
 	if(t && f->returnType != t) ex(MultiLang::incorrect_function_return_type);
 	exprs->semant(e);

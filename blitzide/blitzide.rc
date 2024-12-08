@@ -113,7 +113,6 @@ BEGIN
         MENUITEM "&Back",                       ID_BACK
         MENUITEM "&Forward",                    ID_FORWARD
         MENUITEM "&Quick command help\tF1",     ID_QUICKHELP
-        MENUITEM "&Open blitzide.ini",          ID_OPENINI
         MENUITEM "&About Blitz3D TSS!",         ID_ABOUT
     END
 END

@@ -4,7 +4,7 @@
 
 static std::set<bbStream*> stream_set;
 
-void debugStream(bbStream* s, std::string function) {
+void debugStream(bbStream* s, const char* function) {
 	if (stream_set.count(s)) return;
 	ErrorLog(function, MultiLang::stream_not_exist);
 }

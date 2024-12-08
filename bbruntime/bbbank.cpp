@@ -34,13 +34,13 @@ struct bbBank {
 
 static std::set<bbBank*> bank_set;
 
-static inline void debugBank(bbBank* b, std::string function) {
+static inline void debugBank(bbBank* b, const char* function) {
 	if (!bank_set.count(b)) {
 		ErrorLog(function, MultiLang::bank_not_exist);
 	}
 }
 
-static inline void debugBank(bbBank* b, std::string function, int offset) {
+static inline void debugBank(bbBank* b, const char* function, int offset) {
 	debugBank(b, function);
 	if (offset >= b->size) { 
 		ErrorLog(function, MultiLang::offset_out_of_range);

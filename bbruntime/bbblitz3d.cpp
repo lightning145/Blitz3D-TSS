@@ -53,96 +53,96 @@ static Loader_B3D loader_b3d;
 
 static std::map<std::string, Transform> loader_mat_map;
 
-static inline void debug3d(std::string function) {
+static inline void debug3d(const char* function) {
 	if (!gx_scene) {
 		ErrorLog(function, MultiLang::graphics_not_set);
 	}
 }
 
-static inline void debugTexture(Texture* t, std::string function) {
+static inline void debugTexture(Texture* t, const char* function) {
 	if (!texture_set.count(t)) {
 		ErrorLog(function, MultiLang::texture_not_exist);
 	}
 }
 
-static inline void debugBrush(Brush* b, std::string function) {
+static inline void debugBrush(Brush* b, const char* function) {
 	if (!brush_set.count(b)) {
 		ErrorLog(function, MultiLang::brush_not_exist);
 	}
 }
 
-static inline void debugEntity(Entity* e, std::string function) {
+static inline void debugEntity(Entity* e, const char* function) {
 	if (!entity_set.count(e)) {
 		ErrorLog(function, MultiLang::entity_not_exist);
 	}
 }
 
-static inline void debugParent(Entity* e, std::string function) {
+static inline void debugParent(Entity* e, const char* function) {
 	debug3d(function);
 	if (e && !entity_set.count(e)) ErrorLog(function, MultiLang::parent_entity_not_exist);
 }
 
-static inline void debugMesh(MeshModel* m, std::string function) {
+static inline void debugMesh(MeshModel* m, const char* function) {
 	debugEntity(m, function);
 	if (!m->getMeshModel()) ErrorLog(function, MultiLang::entity_not_mesh);
 }
 
-static inline void debugObject(Object* o, std::string function) {
+static inline void debugObject(Object* o, const char* function) {
 	debugEntity(o, function);
 	if (!o->getObject()) ErrorLog(function, MultiLang::entity_not_object);
 }
 
-static inline void debugColl(Object* o, std::string function, int index) {
+static inline void debugColl(Object* o, const char* function, int index) {
 	debugObject(o, function);
 	if (index<1 || index>o->getCollisions().size()) ErrorLog(function, MultiLang::collision_out_of_range);
 }
 
-static inline void debugCamera(Camera* c, std::string function) {
+static inline void debugCamera(Camera* c, const char* function) {
 	debugEntity(c, function);
 	if (!c->getCamera()) ErrorLog(function, MultiLang::entity_not_camera);
 }
 
-static inline void debugLight(Light* l, std::string function) {
+static inline void debugLight(Light* l, const char* function) {
 	debugEntity(l, function);
 	if (!l->getLight()) ErrorLog(function, MultiLang::entity_not_light);
 }
 
-static inline void debugModel(Model* m, std::string function) {
+static inline void debugModel(Model* m, const char* function) {
 	debugEntity(m, function);
 	if (!m->getModel()) ErrorLog(function, MultiLang::entity_not_model);
 }
 
-static inline void debugSprite(Sprite* s, std::string function) {
+static inline void debugSprite(Sprite* s, const char* function) {
 	debugModel(s, function);
 	if (!s->getSprite()) ErrorLog(function, MultiLang::entity_not_sprite);
 }
 
-static inline void debugMD2(MD2Model* m, std::string function) {
+static inline void debugMD2(MD2Model* m, const char* function) {
 	debugModel(m, function);
 	if (!m->getMD2Model()) ErrorLog(function, MultiLang::entity_not_md2_model);
 }
 
-static inline void debugBSP(Q3BSPModel* m, std::string function) {
+static inline void debugBSP(Q3BSPModel* m, const char* function) {
 	debugModel(m, function);
 	if (!m->getBSPModel()) ErrorLog(function, MultiLang::entity_not_bsp_model);
 }
 
-static inline void debugTerrain(Terrain* t, std::string function) {
+static inline void debugTerrain(Terrain* t, const char* function) {
 	debugModel(t, function);
 	if (!t->getTerrain()) ErrorLog(function, MultiLang::entity_not_terrain);
 }
 
-static inline void debugSegs(int n, std::string function) {
+static inline void debugSegs(int n, const char* function) {
 	debug3d(function);
 	if (n < 3 || n>50) ErrorLog(function, MultiLang::illegal_number_segments);
 }
 
-static inline void debugVertex(Surface* s, std::string function, int n) {
+static inline void debugVertex(Surface* s, const char* function, int n) {
 	debug3d(function);
 	if (n < 0 || n >= s->numVertices()) ErrorLog(function, MultiLang::vertex_out_of_range);
 }
 
-static inline void debugVertex(Surface* s, std::string function, int n, int t) {
+static inline void debugVertex(Surface* s, const char* function, int n, int t) {
 	debug3d(function);
 	if (n < 0 || n >= s->numVertices()) ErrorLog(function, MultiLang::vertex_out_of_range);
 	if (t < 0 || t>1) ErrorLog(function, MultiLang::texture_coordinate_out_of_range);

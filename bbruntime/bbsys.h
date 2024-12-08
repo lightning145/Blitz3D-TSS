@@ -6,8 +6,8 @@
 
 extern bool debug;
 extern gxRuntime* gx_runtime;
-extern std::string&& errorfunc;
-extern std::string&& errorlog;
+extern const char* errorfunc;
+extern const char* errorlog;
 
 struct bbEx {
 	const char* err;

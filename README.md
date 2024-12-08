@@ -2,6 +2,8 @@
 
 This is a **fork** of [Blitz3D TSS](https://github.com/Saalvage/Blitz3D), made by [ZiYueCommentary](https://github.com/ZiYueCommentary/Blitz3D).
 
+中文社区：https://forum.ziyuesinicization.site/t/blitz3d-tss
+
 ## Extending Blitz3D TSS
 Please read [this document](EXTENDING.md).
 

@@ -8,57 +8,8 @@
 std::set<Sound*> sounds;
 SoLoud::Soloud* soloud;
 
-float rolloffFactor = 1.0f;
-float dopplerFactor = 1.0f;
-float distanceFactor = 1.0f;
-
-struct Sound {
-    SoLoud::Wav* const wav;
-
-    float volume = 1.0f;
-    float pan = 0;
-    int pitch = 0;
-
-    explicit Sound(SoLoud::Wav* wav) : wav(wav) {
-        sounds.insert(this);
-    }
-
-    ~Sound() {
-        sounds.erase(this);
-        delete wav;
-    }
-
-    Channel play() const {
-        Channel channel;
-        if (pitch) {
-            channel = soloud->play(*wav, volume, pan, true, 0);
-            soloud->setSamplerate(channel, (float)pitch);
-            soloud->setPause(channel, false);
-        }
-        else {
-            channel = soloud->play(*wav, volume, pan, false, 0);
-        }
-        return channel;
-    }
-
-    Channel play3d(float x, float y, float z, float vx, float vy, float vz) const {
-        Channel channel;
-        wav->set3dAttenuation(SoLoud::AudioSource::INVERSE_DISTANCE, rolloffFactor);
-        wav->set3dDopplerFactor(dopplerFactor);
-        if (pitch) {
-            channel = soloud->play3d(*wav, x, y, z, vx, vy, vz, volume, true, 0);
-            soloud->setSamplerate(channel, (float)pitch);
-            soloud->setPause(channel, false);
-        }
-        else {
-            channel = soloud->play3d(*wav, x, y, z, vx, vy, vz, volume, false, 0);
-        }
-        return channel;
-    }
-};
-
-static inline void debugSound(Sound* s, std::string function) {
-    if (!sounds.contains(s)) ErrorLog(function, MultiLang::sound_not_exist);
+static inline void debugSound(gxSound* s, const char* function) {
+	if (!gx_audio->verifySound(s)) ErrorLog(function, MultiLang::sound_not_exist);
 }
 
 int bbVerifySound(Sound* sound) {
