@@ -23,14 +23,14 @@ gxFont::gxFont(FT_Library ftLibrary, gxGraphics* gfx, const std::string& fn, int
 		RTEX(std::format("Failed to load file: {}", fn).c_str());
 	}
 
+	tempCanvas = nullptr;
 	desc = pango_font_description_from_string(std::format("{0} {1}", face->family_name, h - 5).c_str());
 	FT_Done_Face(face);
-
-	tempCanvas = nullptr;
 }
 
 gxFont::~gxFont() {
 	pango_font_description_free(desc);
+	this->graphics->freeCanvas(tempCanvas);
 }
 
 const int transparentPixel = 0x4A412A;
@@ -38,46 +38,38 @@ const int opaquePixel = 0xffffff;
 
 void gxFont::render(gxCanvas* dest, unsigned color_argb, int x, int y, const std::string& text) {
 	auto [width, height] = stringWidthHeight(text); // modern!
-	if(tempCanvas == nullptr || width > tempCanvas->getWidth() || height > tempCanvas->getHeight()) {
-		graphics->freeCanvas(tempCanvas);
-		tempCanvas = graphics->createCanvas(width, height, 0);
-	}
+	if (width <= 0 || height <= 0) return;
 
-	if((color_argb & 0xffffff) == transparentPixel) { color_argb++; }
+	if (!tempCanvas || tempCanvas->getWidth() < width || tempCanvas->getHeight() < height) {
+		this->graphics->freeCanvas(tempCanvas);
+		tempCanvas = this->graphics->createCanvas(width, height, 0);
+	}
 
 	cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_A1, width, height);
 	cairo_t* cr = cairo_create(surface);
 	PangoLayout* layout = pango_cairo_create_layout(cr);
 	pango_layout_set_text(layout, text.c_str(), text.length());
 	pango_layout_set_font_description(layout, this->desc);
-	//cairo_set_antialias(cr, CAIRO_ANTIALIAS_SUBPIXEL);
-	cairo_set_source_rgb(cr, RGBA_GETRED(color_argb), RGBA_GETGREEN(color_argb), RGBA_GETBLUE(color_argb));
-	pango_cairo_update_layout(cr, layout);
 	pango_cairo_show_layout(cr, layout);
-	
-	int baseline = PANGO_PIXELS(pango_layout_get_baseline(layout));
-
-	tempCanvas->lock();
 	unsigned char* data = cairo_image_surface_get_data(surface);
 	int stride = cairo_image_surface_get_stride(surface);
+
+	tempCanvas->lock();
 	for (int y = 0; y < height; y++) {
+		int line = y * stride;
 		for (int x = 0; x < width; x++) {
-			int byte_index = y * stride + x / 8;
-			int bit_index = x % 8;
-			unsigned char pixel = (data[byte_index] >> bit_index) & 1;
+			unsigned char pixel = (data[line + x / 8] >> (x % 8)) & 1;
 
 			tempCanvas->setPixelFast(x, y, pixel ? color_argb : transparentPixel);
 		}
 	}
-	
-	tempCanvas->unlock();
 	tempCanvas->setMask(transparentPixel);
+	tempCanvas->unlock();
+	dest->blit(x, y, tempCanvas, 0, 0, width, height, false);
 
 	g_object_unref(layout);
 	cairo_destroy(cr);
 	cairo_surface_destroy(surface);
-
-	dest->blit(x, y/*todo baseline*/, tempCanvas, 0, 0, width, height, false);
 }
 
 std::pair<int, int> gxFont::stringWidthHeight(const std::string& text) const {

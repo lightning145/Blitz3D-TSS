@@ -5,8 +5,6 @@
 #include <ft2build.h>
 #include <pango/pangocairo.h>
 #include FT_FREETYPE_H
-#include <vector>
-#include <map>
 
 class gxCanvas;
 class gxGraphics;
@@ -28,11 +26,10 @@ public:
 	bool isPrintable(int chr)const;				//printable char?
 
 private:
-	gxCanvas* tempCanvas;
-
 	int height;
 	PangoFontDescription* desc;
 	gxGraphics* graphics;
+	gxCanvas* tempCanvas;
 };
 
 #endif
