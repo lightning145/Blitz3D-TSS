@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\OpenGL\glad\src\glad.c" />
+    <ClCompile Include="..\OpenGL\MD_Math.cpp" />
     <ClCompile Include="..\OpenGL\Renderer.cpp" />
     <ClCompile Include="ddutil.cpp" />
     <ClCompile Include="gxfont.cpp" />
@@ -170,6 +171,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\OpenGL\MD_Math.h" />
     <ClInclude Include="..\OpenGL\Renderer.h" />
     <ClInclude Include="asmcoder.h" />
     <ClInclude Include="ddutil.h" />

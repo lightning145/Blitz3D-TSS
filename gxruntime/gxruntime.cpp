@@ -215,6 +215,7 @@ gxRuntime::~gxRuntime() {
 void gxRuntime::SwapBackBuffer()
 {
 	SwapBuffers(hDC);
+	delay(1);//Prevent the cycle from being too fast
 }
 
 void gxRuntime::pauseAudio() {

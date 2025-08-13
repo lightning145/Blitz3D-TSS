@@ -26,6 +26,9 @@
     <ClCompile Include="..\OpenGL\Renderer.cpp">
       <Filter>OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="..\OpenGL\MD_Math.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asmcoder.h" />
@@ -49,6 +52,9 @@
     <ClInclude Include="gxutf8.h" />
     <ClInclude Include="std.h" />
     <ClInclude Include="..\OpenGL\Renderer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenGL\MD_Math.h">
       <Filter>OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
