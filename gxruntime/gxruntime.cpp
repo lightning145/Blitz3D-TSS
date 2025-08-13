@@ -6,6 +6,8 @@
 
 #include "../freeimage/freeimage.h"
 
+#include <glad/glad.h>
+
 struct gxRuntime::GfxMode {
 	DDSURFACEDESC2 desc;
 };
@@ -122,6 +124,38 @@ gxRuntime::gxRuntime(HINSTANCE hi, const std::string& cl, HWND hw) :
 
 	FreeImage_Initialise(true);
 
+//Create OpenGL Context////////////////////////////////////////////////////
+	// get the device context (DC)                                            
+	hDC = GetDC(hwnd);                                                  
+
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),    // size of this pfd  
+		1,                                // version number  
+		PFD_DRAW_TO_WINDOW |              // support window  
+		PFD_SUPPORT_OPENGL |              // support OpenGL  
+		PFD_DOUBLEBUFFER,                 // double buffered  
+		PFD_TYPE_RGBA,                    // RGBA type  
+		24,                               // 24-bit color depth  
+		0, 0, 0, 0, 0, 0,                 // color bits ignored  
+		0,                                // no alpha buffer  
+		0,                                // shift bit ignored  
+		0,                                // no accumulation buffer  
+		0, 0, 0, 0,                       // accum bits ignored  
+		32,                               // 32-bit z-buffer      
+		0,                                // no stencil buffer  
+		0,                                // no auxiliary buffer  
+		PFD_MAIN_PLANE,                   // main layer  
+		0,                                // reserved  
+		0, 0, 0                           // layer masks ignored  
+	};
+	int iPixelFormat = ChoosePixelFormat(hDC, &pfd);
+	SetPixelFormat(hDC, iPixelFormat, &pfd);
+	hRC = wglCreateContext(hDC);
+	wglMakeCurrent(hDC, hRC);
+
+	gladLoadGL();
+//////////////////////////////////////////////////////////////////////
+
 	enumGfx();
 	TIMECAPS tc;
 	timeGetDevCaps(&tc, sizeof(tc));
@@ -171,7 +205,16 @@ gxRuntime::~gxRuntime() {
 
 	FreeImage_DeInitialise();
 
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(hRC);
+	ReleaseDC(hwnd, hDC);
+
 	CoUninitialize();
+}
+
+void gxRuntime::SwapBackBuffer()
+{
+	SwapBuffers(hDC);
 }
 
 void gxRuntime::pauseAudio() {

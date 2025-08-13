@@ -21,6 +21,9 @@ public:
 	HWND hwnd;
 	HINSTANCE hinst;
 
+	HDC hDC;
+	HGLRC hRC;
+
 	gxAudio* audio;
 	gxInput* input;
 	gxGraphics* graphics;
@@ -160,6 +163,8 @@ public:
 	int getAvailPhys();
 	int getTotalVirtual();
 	int getAvailVirtual();
+
+	void SwapBackBuffer();
 };
 
 #endif

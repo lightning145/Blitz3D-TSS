@@ -4,6 +4,8 @@
 #include "../gxruntime/gxutf8.h"
 #include "../MultiLang/MultiLang.h"
 
+#include "../OpenGL/Renderer.h"
+
 gxGraphics* gx_graphics;
 gxCanvas* gx_canvas;
 
@@ -1389,8 +1391,14 @@ void bbHidePointer()
     gx_runtime->setPointerVisible(false);
 }
 
+void bbSwapBackBuffer()
+{
+    gx_runtime->SwapBackBuffer();
+}
+
 bool graphics_create()
 {
+    /*
     p_canvas = 0;
     filter = true;
     gx_driver = 0;
@@ -1407,10 +1415,13 @@ bool graphics_create()
         return true;
     }
     return false;
+    */
+    return true;
 }
 
 bool graphics_destroy()
 {
+    /*
     freeGraphics();
     gfx_modes.clear();
     if (gx_graphics)
@@ -1418,11 +1429,15 @@ bool graphics_destroy()
         gx_runtime->closeGraphics(gx_graphics);
         gx_graphics = 0;
     }
+    */
     return true;
 }
 
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
 {
+    //OpenGL
+    rtSym("ClearScreen%red%green%blue", Renderer::Clear);
+    rtSym("SwapBackBuffer", bbSwapBackBuffer);
 
     //gfx driver info
     rtSym("%CountGfxDrivers", bbCountGfxDrivers);
