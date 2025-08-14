@@ -177,7 +177,6 @@
     <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\blitz3d\minidx9\lib\d3dxof.lib" />
     <Library Include="..\fmod375\lib\fmodvc.lib" />
   </ItemGroup>
   <ItemGroup>

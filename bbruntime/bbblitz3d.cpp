@@ -2,6 +2,7 @@
 
 #include "bbblitz3d.h"
 #include "bbgraphics.h"
+/*
 #include "../blitz3d/blitz3d.h"
 #include "../blitz3d/world.h"
 #include "../blitz3d/texture.h"
@@ -21,9 +22,11 @@
 #include "../blitz3d/listener.h"
 #include "../blitz3d/cachedtexture.h"
 #include "../MultiLang/MultiLang.h"
-
+*/
 
 //Why is everything static?
+
+/*
 gxScene* gx_scene;
 extern gxFileSystem* gx_filesys;
 
@@ -182,7 +185,7 @@ static void collapseMesh(MeshModel* mesh, Entity* e) {
 }
 
 static void insert(Entity* e) {
-	/*if (debug)*/ entity_set.insert(e);
+	entity_set.insert(e);
 	e->setVisible(true);
 	e->setEnabled(true);
 	e->getObject()->reset();
@@ -202,7 +205,7 @@ static void erase(Entity* e) {
 		erase(p);
 	}
 	if (e->getListener()) listener = 0;
-	/*if (debug)*/ entity_set.erase(e);
+	entity_set.erase(e);
 }
 
 static Entity* findChild(Entity* e, const std::string& t) {
@@ -2026,8 +2029,10 @@ extern int active_texs;
 int  bbActiveTextures() {
 	return active_texs;
 }
+*/
 
 void blitz3d_open() {
+	/*
 	gx_scene = gx_graphics->createScene(0);
 	if (!gx_scene) RTEX(MultiLang::unable_create_gxscene_instance);
 	world = new World();
@@ -2041,9 +2046,11 @@ void blitz3d_open() {
 	loader_mat_map["3ds"] = Transform(Matrix(Vector(1, 0, 0), Vector(0, 0, 1), Vector(0, 1, 0)));
 	listener = 0;
 	stats_mode = false;
+	*/
 }
 
 void blitz3d_close() {
+	/*
 	if (!gx_scene) return;
 	bbClearWorld(1, 1, 1);
 	Texture::clearFilters();
@@ -2051,12 +2058,16 @@ void blitz3d_close() {
 	delete world;
 	gx_graphics->freeScene(gx_scene);
 	gx_scene = 0;
+	*/
 }
 
 bool blitz3d_create() {
+	/*
 	tri_count = 0;
 	gx_scene = 0; world = 0;
+	*/
 	return true;
+	
 }
 
 bool blitz3d_destroy() {
@@ -2065,6 +2076,7 @@ bool blitz3d_destroy() {
 }
 
 void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
+	/*
 	rtSym("LoaderMatrix$file_ext#xx#xy#xz#yx#yy#yz#zx#zy#zz", bbLoaderMatrix);
 	rtSym("HWMultiTex%enable", bbHWMultiTex);
 	rtSym("%HWTexUnits", bbHWTexUnits);
@@ -2353,4 +2365,5 @@ void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
 	rtSym("%AvailVirtual", bbAvailVirtual);
 
 	rtSym("%RunningOnWine", bbRunningUnderWine);
+	*/
 }

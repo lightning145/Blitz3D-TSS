@@ -10,6 +10,12 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="blitz3d.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="blitz3d.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <SccProjectName />
     <SccLocalPath />
@@ -137,85 +143,6 @@
       <OutputFile>.\Debug\blitz3d.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="animation.cpp" />
-    <ClCompile Include="animator.cpp" />
-    <ClCompile Include="brush.cpp" />
-    <ClCompile Include="cachedtexture.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="collision.cpp" />
-    <ClCompile Include="entity.cpp" />
-    <ClCompile Include="frustum.cpp" />
-    <ClCompile Include="geom.cpp" />
-    <ClCompile Include="light.cpp" />
-    <ClCompile Include="listener.cpp" />
-    <ClCompile Include="loader_3ds.cpp" />
-    <ClCompile Include="loader_b3d.cpp" />
-    <ClCompile Include="loader_x.cpp" />
-    <ClCompile Include="md2model.cpp" />
-    <ClCompile Include="md2norms.cpp" />
-    <ClCompile Include="md2rep.cpp" />
-    <ClCompile Include="meshcollider.cpp" />
-    <ClCompile Include="meshloader.cpp" />
-    <ClCompile Include="meshmodel.cpp" />
-    <ClCompile Include="meshutil.cpp" />
-    <ClCompile Include="mirror.cpp" />
-    <ClCompile Include="model.cpp" />
-    <ClCompile Include="object.cpp" />
-    <ClCompile Include="pivot.cpp" />
-    <ClCompile Include="planemodel.cpp" />
-    <ClCompile Include="q3bspmodel.cpp" />
-    <ClCompile Include="q3bsprep.cpp" />
-    <ClCompile Include="sprite.cpp" />
-    <ClCompile Include="std.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">std.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="surface.cpp" />
-    <ClCompile Include="terrain.cpp" />
-    <ClCompile Include="terrainrep.cpp" />
-    <ClCompile Include="texture.cpp" />
-    <ClCompile Include="world.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="animation.h" />
-    <ClInclude Include="animator.h" />
-    <ClInclude Include="blitz3d.h" />
-    <ClInclude Include="brush.h" />
-    <ClInclude Include="cachedtexture.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="collision.h" />
-    <ClInclude Include="entity.h" />
-    <ClInclude Include="frustum.h" />
-    <ClInclude Include="geom.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="listener.h" />
-    <ClInclude Include="loader_3ds.h" />
-    <ClInclude Include="loader_b3d.h" />
-    <ClInclude Include="loader_x.h" />
-    <ClInclude Include="md2model.h" />
-    <ClInclude Include="md2norms.h" />
-    <ClInclude Include="md2rep.h" />
-    <ClInclude Include="meshcollider.h" />
-    <ClInclude Include="meshloader.h" />
-    <ClInclude Include="meshmodel.h" />
-    <ClInclude Include="meshutil.h" />
-    <ClInclude Include="mirror.h" />
-    <ClInclude Include="model.h" />
-    <ClInclude Include="object.h" />
-    <ClInclude Include="pivot.h" />
-    <ClInclude Include="planemodel.h" />
-    <ClInclude Include="q3bspmodel.h" />
-    <ClInclude Include="q3bsprep.h" />
-    <ClInclude Include="rendercontext.h" />
-    <ClInclude Include="sprite.h" />
-    <ClInclude Include="std.h" />
-    <ClInclude Include="surface.h" />
-    <ClInclude Include="terrain.h" />
-    <ClInclude Include="terrainrep.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="world.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
