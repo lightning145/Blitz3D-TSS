@@ -6,7 +6,6 @@
 
 extern gxGraphics* gx_graphics;
 extern gxCanvas* gx_canvas;
-extern gxScene* gx_scene;
 
 class bbImage;
 

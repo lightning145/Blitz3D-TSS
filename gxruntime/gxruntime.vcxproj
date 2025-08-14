@@ -150,13 +150,10 @@
     <ClCompile Include="gxfilesystem.cpp" />
     <ClCompile Include="gxgraphics.cpp" />
     <ClCompile Include="gxinput.cpp" />
-    <ClCompile Include="gxlight.cpp" />
-    <ClCompile Include="gxmesh.cpp" />
     <ClCompile Include="gxmovie.cpp" />
     <ClCompile Include="gxruntime.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
-    <ClCompile Include="gxscene.cpp" />
     <ClCompile Include="gxsound.cpp" />
     <ClCompile Include="gxtimer.cpp" />
     <ClCompile Include="gxutf8.cpp" />
@@ -179,11 +176,8 @@
     <ClInclude Include="gxfilesystem.h" />
     <ClInclude Include="gxgraphics.h" />
     <ClInclude Include="gxinput.h" />
-    <ClInclude Include="gxlight.h" />
-    <ClInclude Include="gxmesh.h" />
     <ClInclude Include="gxmovie.h" />
     <ClInclude Include="gxruntime.h" />
-    <ClInclude Include="gxscene.h" />
     <ClInclude Include="gxsound.h" />
     <ClInclude Include="gxtimer.h" />
     <ClInclude Include="gxutf8.h" />

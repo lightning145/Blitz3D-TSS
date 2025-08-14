@@ -52,39 +52,6 @@ void PixelFormat::setFormat(const DDPIXELFORMAT& pf) {
 	asm_coder.CodePoint(point_code, depth, amask, rmask, gmask, bmask);
 }
 
-static void adjustTexSize(int* width, int* height, IDirect3DDevice7* dir3dDev) {
-	D3DDEVICEDESC7 ddDesc = { 0 };
-	if(dir3dDev->GetCaps(&ddDesc) < 0) {
-		*width = *height = 256;
-		return;
-	}
-	int w = *width, h = *height, min, max;
-	//make power of 2
-	//Try *always* making POW2 size to fix GF6800 non-pow2 tex issue
-	for(w = 1; w < *width; w <<= 1) {}
-	for(h = 1; h < *height; h <<= 1) {}
-	//make square
-	if(ddDesc.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY) {
-		if(w > h) h = w;
-		else w = h;
-	}
-	//check aspect ratio
-	if(max = ddDesc.dwMaxTextureAspectRatio) {
-		int asp = w > h ? w / h : h / w;
-		if(asp > max) {
-			if(w > h) h = w / max;
-			else w = h / max;
-		}
-	}
-	//clamp size
-	if((min = ddDesc.dwMinTextureWidth) && w < min) w = min;
-	if((min = ddDesc.dwMinTextureHeight) && h < min) h = min;
-	if((max = ddDesc.dwMaxTextureWidth) && w > max) w = max;
-	if((max = ddDesc.dwMaxTextureHeight) && h > max) h = max;
-
-	*width = w; *height = h;
-}
-
 static ddSurf* createSurface(int width, int height, int pitch, void* bits, IDirectDraw7* dirDraw) {
 	DDSURFACEDESC2 desc = { sizeof(desc) };
 	desc.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_LPSURFACE | DDSD_PITCH | DDSD_PIXELFORMAT | DDSD_CAPS;
@@ -296,7 +263,7 @@ ddSurf* ddUtil::createSurface(int w, int h, int flags, gxGraphics* gfx) {
 			desc.ddsCaps.dwCaps |= DDSCAPS_COMPLEX;
 			desc.ddsCaps.dwCaps2 |= DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_ALLFACES;
 		}
-		adjustTexSize((int*)&desc.dwWidth, (int*)&desc.dwHeight, gfx->dir3dDev);
+		
 	}
 	else {
 		desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
@@ -506,7 +473,7 @@ ddSurf* ddUtil::loadSurface(const std::string& f, int flags, gxGraphics* gfx) {
 	}
 
 	int t_w = width, t_h = height;
-	if(flags & gxCanvas::CANVAS_TEXTURE) adjustTexSize(&t_w, &t_h, gfx->dir3dDev);
+
 	copy(dest, 0, 0, t_w, t_h, src, 0, height - 1, width, -height);
 
 	src->Release();

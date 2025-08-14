@@ -13,7 +13,6 @@ struct gxRuntime::GfxDriver {
 	GUID* guid;
 	std::string name;
 	std::vector<GfxMode*> modes;
-	D3DDEVICEDESC7 d3d_desc;
 };
 
 static const int static_ws = WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
@@ -800,10 +799,7 @@ bool gxRuntime::setDisplayMode(int w, int h, int d, bool d3d, IDirectDraw7* dirD
 	int best_d = 0;
 
 	if(d3d) {
-		int bd = curr_driver->d3d_desc.dwDeviceRenderBitDepth;
-		if(bd & DDBD_32) best_d = 32;
-		else if(bd & DDBD_24) best_d = 24;
-		else if(bd & DDBD_16) best_d = 16;
+		
 	}
 	else {
 		int best_n = 0;
@@ -1065,19 +1061,6 @@ static HRESULT WINAPI enumMode(DDSURFACEDESC2* desc, void* context) {
 }
 
 static int maxDevType;
-static HRESULT CALLBACK enumDevice(char* desc, char* name, D3DDEVICEDESC7* devDesc, void* context) {
-	int t = 0;
-	GUID guid = devDesc->deviceGUID;
-	if(guid == IID_IDirect3DRGBDevice) t = 1;
-	else if(guid == IID_IDirect3DHALDevice) t = 2;
-	else if(guid == IID_IDirect3DTnLHalDevice) t = 3;
-	if(t > 1 && t > maxDevType) {
-		maxDevType = t;
-		gxRuntime::GfxDriver* d = (gxRuntime::GfxDriver*)context;
-		d->d3d_desc = *devDesc;
-	}
-	return D3DENUMRET_OK;
-}
 
 static BOOL WINAPI enumDriver(GUID FAR* guid, LPSTR desc, LPSTR name, LPVOID context, HMONITOR hm) {
 	IDirectDraw7* dd;
@@ -1093,13 +1076,6 @@ static BOOL WINAPI enumDriver(GUID FAR* guid, LPSTR desc, LPSTR name, LPVOID con
 	d->guid = guid ? new GUID(*guid) : 0;
 	d->name = desc;
 
-	memset(&d->d3d_desc, 0, sizeof(d->d3d_desc));
-	IDirect3D7* dir3d;
-	if(dd->QueryInterface(IID_IDirect3D7, (void**)&dir3d) >= 0) {
-		maxDevType = 0;
-		dir3d->EnumDevices(enumDevice, d);
-		dir3d->Release();
-	}
 	std::vector<gxRuntime::GfxDriver*>* drivers = (std::vector<gxRuntime::GfxDriver*>*)context;
 	drivers->push_back(d);
 	dd->EnumDisplayModes(0, 0, d, enumMode);
@@ -1138,7 +1114,7 @@ int gxRuntime::numGraphicsDrivers() {
 void gxRuntime::graphicsDriverInfo(int driver, std::string* name, int* c) {
 	GfxDriver* g = drivers[driver];
 	int caps = 0;
-	if(g->d3d_desc.dwDeviceRenderBitDepth) caps |= GFXMODECAPS_3D;
+	
 	*name = g->name;
 	*c = caps;
 }
@@ -1157,7 +1133,7 @@ void gxRuntime::graphicsModeInfo(int driver, int mode, int* w, int* h, int* d, i
 		case 24:bd = DDBD_24; break;
 		case 32:bd = DDBD_32; break;
 	}
-	if(g->d3d_desc.dwDeviceRenderBitDepth & bd) caps |= GFXMODECAPS_3D;
+	
 	*w = m->desc.dwWidth;
 	*h = m->desc.dwHeight;
 	*d = m->desc.ddpfPixelFormat.dwRGBBitCount;
@@ -1172,7 +1148,7 @@ void gxRuntime::windowedModeInfo(int* c) {
 		case 24:bd = DDBD_24; break;
 		case 32:bd = DDBD_32; break;
 	}
-	if(drivers[0]->d3d_desc.dwDeviceRenderBitDepth & bd) caps |= GFXMODECAPS_3D;
+	
 	*c = caps;
 }
 
@@ -1295,12 +1271,6 @@ std::string gxRuntime::systemProperty(const std::string& p) {
 	}
 	else if(t == "tempdir") {
 		if(GetTempPath(MAX_PATH, buff)) return toDir(buff);
-	}
-	else if(t == "direct3d7") {
-		if(graphics) return itoa((int)graphics->dir3d);
-	}
-	else if(t == "direct3ddevice7") {
-		if(graphics) return itoa((int)graphics->dir3dDev);
 	}
 	else if(t == "directdraw7") {
 		if(graphics) return itoa((int)graphics->dirDraw);

@@ -6,14 +6,11 @@
 
 #include <set>
 #include <string>
-#include <d3d.h>
 
 #include "ddutil.h"
 
 #include "gxfont.h"
 #include "gxcanvas.h"
-#include "gxscene.h"
-#include "gxmesh.h"
 #include "gxmovie.h"
 
 class gxRuntime;
@@ -23,9 +20,6 @@ public:
 	IDirectDraw7* dirDraw;
 	IDirectDraw* ds_dirDraw;
 
-	IDirect3D7* dir3d;
-	IDirect3DDevice7* dir3dDev;
-	D3DDEVICEDESC7 dir3dDevDesc;
 	DDPIXELFORMAT primFmt, zbuffFmt;
 
 	DDPIXELFORMAT texRGBFmt[2], texAlphaFmt[2], texRGBAlphaFmt[2], texRGBMaskFmt[2];
@@ -47,12 +41,9 @@ private:
 	gxCanvas* front_canvas, * back_canvas;
 	gxFont* def_font;
 	bool gfx_lost;
-	gxMesh* dummy_mesh;
 
 	std::set<gxFont*> font_set;
 	std::set<gxCanvas*> canvas_set;
-	std::set<gxMesh*> mesh_set;
-	std::set<gxScene*> scene_set;
 	std::set<gxMovie*> movie_set;
 	std::set<std::string> font_res;
 
@@ -107,13 +98,6 @@ public:
 	gxFont* verifyFont(gxFont* font);
 	void freeFont(gxFont* font);
 
-	gxScene* createScene(int flags);
-	gxScene* verifyScene(gxScene* scene);
-	void freeScene(gxScene* scene);
-
-	gxMesh* createMesh(int max_verts, int max_tris, int flags);
-	gxMesh* verifyMesh(gxMesh* mesh);
-	void freeMesh(gxMesh* mesh);
 };
 
 #endif
