@@ -1,6 +1,6 @@
 Debug
 Release
-#_release/bin
+_release/bin
 _release/cfg/blitzide.ini
 _release/temp
 _release/userlibs
@@ -8,7 +8,7 @@ _release/Blitz3D.exe
 _release/*.bb
 _release/*.ttf
 *.exe
-#*.dll
+*.dll
 *.pdb
 *.ilk
 *.aps
