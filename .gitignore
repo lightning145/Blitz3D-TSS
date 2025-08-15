@@ -8,7 +8,7 @@ _release/Blitz3D.exe
 _release/*.bb
 _release/*.ttf
 *.exe
-*.dll
+#*.dll
 *.pdb
 *.ilk
 *.aps
