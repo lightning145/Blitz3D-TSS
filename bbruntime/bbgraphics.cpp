@@ -1425,8 +1425,15 @@ bool graphics_destroy()
     return true;
 }
 
+void Graphics(int w, int h)
+{
+    gx_runtime->InitWindow(w, h);
+}
+
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
 {
+
+    rtSym("Graphics%w%h", Graphics);
     /*
     //gfx driver info
     rtSym("%CountGfxDrivers", bbCountGfxDrivers);

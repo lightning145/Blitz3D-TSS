@@ -14,7 +14,6 @@
 class gxRuntime {
 	/***** INTERNAL INTERFACE *****/
 public:
-
 	HWND hwnd;
 	HINSTANCE hinst;
 
@@ -24,9 +23,17 @@ public:
 
 	LRESULT windowProc(HWND hwnd, UINT msg, WPARAM w, LPARAM l);
 
+	void InitWindow(int width, int height);
+
 private:
 	gxRuntime(HINSTANCE hinst, const std::string& cmd_line, HWND hwnd);
 	~gxRuntime();
+
+	void paint();
+	void suspend();
+	void forceSuspend();
+	void resume();
+	void forceResume();
 
 	RECT t_rect;
 	int t_style;
@@ -36,11 +43,11 @@ private:
 	std::string app_close;
 
 	bool enum_all;
+	int use_di;  
 
-	void suspend();
-	void resume();
-	void forceSuspend();
-	void forceResume();
+	void resetInput(); 
+	void pauseAudio();  
+	void resumeAudio(); 
 
 	/***** APP INTERFACE *****/
 public:
@@ -75,6 +82,10 @@ public:
 	void debugError(const char* t);
 	void debugLog(const char* t);
 
+	bool focus();
+	int desktopWidth();
+	int desktopHeight();
+
 	gxFileSystem* openFileSystem(int flags);
 	void closeFileSystem(gxFileSystem* filesys);
 
@@ -82,6 +93,9 @@ public:
 	void freeTimer(gxTimer* timer);
 
 	void calculateDPI();
+
+	void enableDirectInput(bool use);
+	int  directInputEnabled() { return use_di; }
 
 	int callDll(const std::string& dll, const std::string& func, const void* in, int in_sz, void* out, int out_sz);
 
