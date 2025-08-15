@@ -4,6 +4,7 @@
 #include "../gxruntime/gxutf8.h"
 #include "../MultiLang/MultiLang.h"
 
+/*
 gxGraphics* gx_graphics;
 gxCanvas* gx_canvas;
 
@@ -685,10 +686,6 @@ void bbOval(int x, int y, int w, int h, int solid)
     gx_canvas->oval(x, y, w, h, solid);
 }
 
-/*
-* xPos: 0 = align left, 1 = align center, 2 = align right
-* yPos: 0 = align top, 1 = align middle, 2 = align bottom
-*/
 void bbText(int x, int y, BBStr* str, int xPos, int yPos)
 {
     if (xPos == 2) x -= curr_font->getWidth(*str);
@@ -1389,8 +1386,11 @@ void bbHidePointer()
     gx_runtime->setPointerVisible(false);
 }
 
+*/
+
 bool graphics_create()
 {
+    /*
     p_canvas = 0;
     filter = true;
     gx_driver = 0;
@@ -1407,10 +1407,13 @@ bool graphics_create()
         return true;
     }
     return false;
+    */
+    return true;
 }
 
 bool graphics_destroy()
 {
+    /*
     freeGraphics();
     gfx_modes.clear();
     if (gx_graphics)
@@ -1418,12 +1421,13 @@ bool graphics_destroy()
         gx_runtime->closeGraphics(gx_graphics);
         gx_graphics = 0;
     }
+    */
     return true;
 }
 
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
 {
-
+    /*
     //gfx driver info
     rtSym("%CountGfxDrivers", bbCountGfxDrivers);
     rtSym("$GfxDriverName%driver", bbGfxDriverName);
@@ -1573,6 +1577,7 @@ void graphics_link(void (*rtSym)(const char* sym, void* pc))
 
     rtSym("%DesktopWidth", bbDesktopWidth);
     rtSym("%DesktopHeight", bbDesktopHeight);
+    */
 }
 
 extern "C" {

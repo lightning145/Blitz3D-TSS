@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "bbsys.h"
+/*
 #include "../gxruntime/gxinput.h"
 
 extern gxInput* gx_input;
@@ -56,5 +57,6 @@ int		 bbJoyVDir(int port);
 void	 bbJoyVibrate(int port, float left, float right);
 void	 bbStopJoyVibrate(int port);
 void	 bbFlushJoy();
+*/
 
 #endif

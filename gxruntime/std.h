@@ -1,8 +1,6 @@
 #ifndef STD_H
 #define STD_H
 
-#include "..//fmod375/include/fmod.h"
-
 #include "../config/config.h"
 #include "../stdutil/stdutil.h"
 #include "../bbruntime/constants.h"
@@ -22,6 +20,5 @@
 
 #include <math.h>
 #include <Windows.h>
-#include <ddraw.h> // Why are we still here? Just to suffer?
 
 #endif

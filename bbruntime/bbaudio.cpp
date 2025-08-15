@@ -2,6 +2,7 @@
 #include "bbaudio.h"
 #include "../MultiLang/MultiLang.h"
 
+/*
 gxAudio* gx_audio;
 
 static inline void debugSound(gxSound* s, const char* function) {
@@ -106,20 +107,21 @@ int bbChannelPlaying(gxChannel* channel) {
 
 gxSound* bbLoad3DSound(BBStr* f) {
 	return loadSound(f, true);
-}
+}*/
 
 bool audio_create() {
-	gx_audio = gx_runtime->openAudio(0);
+	//gx_audio = gx_runtime->openAudio(0);
 	return true;
 }
 
 bool audio_destroy() {
-	if (gx_audio) gx_runtime->closeAudio(gx_audio);
-	gx_audio = 0;
+	//if (gx_audio) gx_runtime->closeAudio(gx_audio);
+	//gx_audio = 0;
 	return true;
 }
 
 void audio_link(void(*rtSym)(const char*, void*)) {
+	/*
 	rtSym("%VerifySound%sound", bbVerifySound);
 	rtSym("%LoadSound$filename", bbLoadSound);
 	rtSym("FreeSound%sound", bbFreeSound);
@@ -138,4 +140,5 @@ void audio_link(void(*rtSym)(const char*, void*)) {
 	rtSym("ChannelPan%channel#pan", bbChannelPan);
 	rtSym("%ChannelPlaying%channel", bbChannelPlaying);
 	rtSym("%Load3DSound$filename", bbLoad3DSound);
+	*/
 }

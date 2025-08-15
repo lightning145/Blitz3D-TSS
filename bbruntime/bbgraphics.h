@@ -2,6 +2,7 @@
 #define BBGRAPHICS_H
 
 #include "bbsys.h"
+/*
 #include "../gxruntime/gxgraphics.h"
 
 extern gxGraphics* gx_graphics;
@@ -119,5 +120,7 @@ void	 bbWrite(BBStr* str);
 void	 bbPrint(BBStr* str);
 BBStr* bbInput(BBStr* prompt);
 void	 bbLocate(int x, int y);
+
+*/
 
 #endif

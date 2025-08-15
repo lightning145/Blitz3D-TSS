@@ -2,6 +2,7 @@
 #include "bbsys.h"
 #include "../gxruntime/gxutf8.h"
 
+/*
 gxInput* gx_input;
 gxDevice* gx_mouse;
 gxDevice* gx_keyboard;
@@ -10,8 +11,9 @@ std::vector<gxDevice*> gx_joysticks;
 static int mouse_x, mouse_y, mouse_z;
 static const float JLT = -1.0f / 3.0f;
 static const float JHT = 1.0f / 3.0f;
-
+*/
 bool input_create() {
+	/*
 	if (gx_input = gx_runtime->openInput(0)) {
 		if (gx_keyboard = gx_input->getKeyboard()) {
 			if (gx_mouse = gx_input->getMouse()) {
@@ -27,15 +29,21 @@ bool input_create() {
 		gx_input = 0;
 	}
 	return false;
-}
+	*/
 
-bool input_destroy() {
-	gx_joysticks.clear();
-	gx_runtime->closeInput(gx_input);
-	gx_input = 0;
 	return true;
 }
 
+bool input_destroy() {
+	/*
+	gx_joysticks.clear();
+	gx_runtime->closeInput(gx_input);
+	gx_input = 0;
+	*/
+	return true;
+}
+
+/*
 int bbKeyDown(int n) {
 	return gx_keyboard->keyDown(n);
 }
@@ -307,8 +315,10 @@ void  bbEnableDirectInput(int enable) {
 int  bbDirectInputEnabled() {
 	return gx_runtime->directInputEnabled();
 }
+*/
 
 void input_link(void (*rtSym)(const char* sym, void* pc)) {
+	/*
 	rtSym("%KeyDown%key", bbKeyDown);
 	rtSym("%KeyHit%key", bbKeyHit);
 	rtSym("%GetKey", bbGetKey);
@@ -360,4 +370,6 @@ void input_link(void (*rtSym)(const char* sym, void* pc)) {
 
 	rtSym("EnableDirectInput%enable", bbEnableDirectInput);
 	rtSym("%DirectInputEnabled", bbDirectInputEnabled);
+
+	*/
 }
