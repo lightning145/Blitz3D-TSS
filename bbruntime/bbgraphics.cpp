@@ -4,6 +4,8 @@
 #include "../gxruntime/gxutf8.h"
 #include "../MultiLang/MultiLang.h"
 
+#include <glad/glad.h>
+
 /*
 gxGraphics* gx_graphics;
 gxCanvas* gx_canvas;
@@ -1390,6 +1392,7 @@ void bbHidePointer()
 
 bool graphics_create()
 {
+    gx_runtime->InitWindow(400, 300);
     /*
     p_canvas = 0;
     filter = true;
@@ -1422,6 +1425,7 @@ bool graphics_destroy()
         gx_graphics = 0;
     }
     */
+    gx_runtime->FreeWindow();
     return true;
 }
 
@@ -1430,10 +1434,29 @@ void Graphics(int w, int h)
     gx_runtime->InitWindow(w, h);
 }
 
+void Present()
+{
+    gx_runtime->SwapBackBuffer();
+}
+
+void SetViewPort(int x,int y, int width, int height)
+{
+    glViewport(x, y, width, height);
+}
+
+void Clear(int red, int green, int blue)
+{
+    glClearColor(float(red)/255.0f, (float)green / 255.0f, (float)blue / 255.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
 {
 
     rtSym("Graphics%w%h", Graphics);
+    rtSym("Present", Present);
+    rtSym("Clear%r%g%b", Clear);
+    rtSym("SetViewport%x%y%w%h", SetViewPort);
     /*
     //gfx driver info
     rtSym("%CountGfxDrivers", bbCountGfxDrivers);

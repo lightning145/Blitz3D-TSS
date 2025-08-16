@@ -17,6 +17,9 @@ public:
 	HWND hwnd;
 	HINSTANCE hinst;
 
+	HDC hDC;
+	HGLRC hRC;
+
 	gxFileSystem* fileSystem;
 
 	float scale_x = .0f, scale_y = .0f;
@@ -24,6 +27,8 @@ public:
 	LRESULT windowProc(HWND hwnd, UINT msg, WPARAM w, LPARAM l);
 
 	void InitWindow(int width, int height);
+	void FreeWindow();
+	void SwapBackBuffer();
 
 private:
 	gxRuntime(HINSTANCE hinst, const std::string& cmd_line, HWND hwnd);

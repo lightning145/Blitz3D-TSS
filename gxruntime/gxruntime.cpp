@@ -2,6 +2,8 @@
 #include "gxruntime.h"
 #include "../gxruntime/gxutf8.h"
 
+#include <glad/glad.h>
+
 static const int static_ws = WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 static const int scaled_ws = WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
@@ -149,7 +151,51 @@ void gxRuntime::InitWindow(int width, int height)
 	SetWindowLong(hwnd, GWL_STYLE, ss);
 
 	UpdateWindow(hwnd);
-	
+
+	//Make OpenGL Context
+	// get the device context (DC)
+	hDC = GetDC(hwnd);
+
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),    // size of this pfd  
+		1,                                // version number  
+		PFD_DRAW_TO_WINDOW |              // support window  
+		PFD_SUPPORT_OPENGL |              // support OpenGL  
+		PFD_DOUBLEBUFFER,                 // double buffered  
+		PFD_TYPE_RGBA,                    // RGBA type  
+		24,                               // 24-bit color depth  
+		0, 0, 0, 0, 0, 0,                 // color bits ignored  
+		0,                                // no alpha buffer  
+		0,                                // shift bit ignored  
+		0,                                // no accumulation buffer  
+		0, 0, 0, 0,                       // accum bits ignored  
+		32,                               // 32-bit z-buffer      
+		0,                                // no stencil buffer  
+		0,                                // no auxiliary buffer  
+		PFD_MAIN_PLANE,                   // main layer  
+		0,                                // reserved  
+		0, 0, 0                           // layer masks ignored  
+	};
+	int iPixelFormat = ChoosePixelFormat(hDC, &pfd);
+	SetPixelFormat(hDC, iPixelFormat, &pfd);
+	hRC = wglCreateContext(hDC);
+	wglMakeCurrent(hDC, hRC);
+
+	gladLoadGL();
+}
+
+void gxRuntime::FreeWindow()
+{
+	closeRuntime(this);
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(hRC);
+	ReleaseDC(hwnd, hDC);
+}
+
+void gxRuntime::SwapBackBuffer()
+{
+	SwapBuffers(hDC);
+	Sleep(1);
 }
 
 void gxRuntime::pauseAudio() {
