@@ -19,6 +19,8 @@ Please read [this document](EXTENDING.md).
 
 ### Steps
 
+You need to go to the Releases, find Assimp, and extract it to the repository
+
 1. Open `blitz3d.sln` in Visual Studio 2022.
 2. Select Release or Debug config and rebuild the entire solution.
 3. All done! You can find output files in the `_release` and `_release/bin` dirs. Feel free to delete `.pdb` and `.ilk` files here.

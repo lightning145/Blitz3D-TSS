@@ -94,7 +94,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <CallingConvention>StdCall</CallingConvention>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\freetype\include;..\glad\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\freetype\include;..\glad\include;..\assimp\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
@@ -126,7 +126,7 @@
       <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CallingConvention>StdCall</CallingConvention>
-      <AdditionalIncludeDirectories>..\freetype\include;..\glad\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\freetype\include;..\glad\include;..\assimp\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

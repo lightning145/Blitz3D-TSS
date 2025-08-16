@@ -6,6 +6,10 @@
 
 #include <glad/glad.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 /*
 gxGraphics* gx_graphics;
 gxCanvas* gx_canvas;
@@ -1448,6 +1452,13 @@ void Clear(int red, int green, int blue)
 {
     glClearColor(float(red)/255.0f, (float)green / 255.0f, (float)blue / 255.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void AssimpTest()
+{
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile("", aiProcess_FlipUVs);
+    importer.FreeScene();
 }
 
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
