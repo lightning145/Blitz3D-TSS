@@ -6,9 +6,16 @@
 
 #include <glad/glad.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "../blitz3d/ShaderFile.h"
+#include "../blitz3d/Font.h"
+#include "../blitz3d/FrameBuffer.h"
+#include "../blitz3d/Animator.h"
+#include "../blitz3d/stb_image.h"
+#include "../blitz3d/GameTimer.h"
+
+using namespace MD_Math;
+
+FT_Library ft;
 
 /*
 gxGraphics* gx_graphics;
@@ -1397,6 +1404,12 @@ void bbHidePointer()
 bool graphics_create()
 {
     gx_runtime->InitWindow(400, 300);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    FT_Init_FreeType(&ft);
+    stbi_set_flip_vertically_on_load(true);
     /*
     p_canvas = 0;
     filter = true;
@@ -1430,6 +1443,7 @@ bool graphics_destroy()
     }
     */
     gx_runtime->FreeWindow();
+    FT_Done_FreeType(ft);
     return true;
 }
 
@@ -1438,8 +1452,41 @@ void Graphics(int w, int h)
     gx_runtime->InitWindow(w, h);
 }
 
+int GetWindowWidth()
+{
+    return gx_runtime->GetWidth();
+}
+
+int GetWindowHeight()
+{
+    return gx_runtime->GetHeight();
+}
+
+void SetBuffer()
+{
+    FrameBuffer::InitBuffer(GetWindowWidth(), GetWindowHeight());
+}
+
+void FreeBuffer()
+{
+    FrameBuffer::FreeBuffer();
+}
+
 void Present()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    FrameBuffer::FBshader.Use();
+    glBindVertexArray(FrameBuffer::quadVAO);
+    glDisable(GL_DEPTH_TEST);
+    glBindTexture(GL_TEXTURE_2D, FrameBuffer::texture_fbo);
+    glActiveTexture(GL_TEXTURE0); 
+    glBindTexture(GL_TEXTURE_2D, FrameBuffer::texture_fbo);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
     gx_runtime->SwapBackBuffer();
 }
 
@@ -1450,15 +1497,135 @@ void SetViewPort(int x,int y, int width, int height)
 
 void Clear(int red, int green, int blue)
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer::FBO);
     glClearColor(float(red)/255.0f, (float)green / 255.0f, (float)blue / 255.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 }
 
-void AssimpTest()
+Font* LoadFont(BBStr* fontpath, int size)
 {
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile("", aiProcess_FlipUVs);
-    importer.FreeScene();
+    Font* font = new Font(fontpath->c_str(), size, ft);
+    return font;
+    delete font;
+    delete fontpath;
+}
+
+void SetFont(Font* font)
+{
+    font->Set();
+}
+
+void TextDraw(Font* font, int x, int y, BBStr* str)
+{
+    font->Text(str->c_str());
+
+    text1Shader.Link();
+    text1Shader.Use();
+    text1Shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)GetWindowWidth() / (float)GetWindowHeight(), 0.1f, 100.0f));
+    text1Shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
+    text1Shader.SetMatrix("model", IdentityMatrix());
+    text1Shader.SetVec3("textColor", VECTOR3(1.0f, 1.0f, 1.0f));
+
+    font->Draw((float)x / (float)GetWindowWidth(), (float)y / (float)GetWindowHeight(), 0.0f, 0.003f);
+    delete str;
+}
+
+void FreeFont(Font* font)
+{
+    delete font;
+}
+
+Model* LoadModel(BBStr* modelpath)
+{
+    Model* model = new Model(modelpath->c_str());
+    return model;
+    delete modelpath;
+}
+
+void DrawModel(Model* model, float x, float y, float z)
+{
+    model->modelShader.Use();
+    model->modelShader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)GetWindowWidth() / (float)GetWindowHeight(), 0.1f, 100.0f));
+    model->modelShader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
+    model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
+    model->Draw();
+}
+
+void FreeModel(Model* model)
+{
+    model->Free();
+    delete model;
+}
+
+Animator* CreateAnimation(Model* model)
+{
+    Animator* Anim = new Animator(model);
+    return Anim;
+}
+
+void PlayAnimation(Animator* animator, float currentTime, int mode, float speed, int begin, int end)
+{
+
+    animator->SetAnimation(mode, speed);
+
+    if (begin >= 0 && end > begin) {
+        animator->SetAnimationRange(static_cast<float>(begin), static_cast<float>(end));
+    }
+
+    animator->UpdateAnimation(currentTime);
+
+    animator->modelShader.Use();
+    animator->modelShader.SetInt("useBones", (int)true);
+    animator->SetShader(animator->modelShader);
+}
+
+void FreeAnimation(Animator* animator)
+{
+    if (animator) {
+        delete animator;
+    }
+}
+
+GameTimer* CreateGameTimer()
+{
+    GameTimer* timer = new GameTimer();
+    return timer;
+}
+
+void TimeReset(GameTimer* timer)
+{
+    timer->Reset();
+}
+
+void TimePause(GameTimer* timer)
+{
+    timer->Pause();
+}
+
+void TimeResume(GameTimer* timer)
+{
+    timer->Resume();
+}
+
+float getCurrentTime(GameTimer* timer)
+{
+    return (float)timer->getCurrentTime();
+}
+
+float getDeltaTime(GameTimer* timer)
+{
+    return timer->GetDeltaTime();
+}
+
+void TimeIsPaused(GameTimer* timer)
+{
+    timer->IsPaused();
+}
+
+void FreeGameTimer(GameTimer* time)
+{
+    delete time;
 }
 
 void graphics_link(void (*rtSym)(const char* sym, void* pc))
@@ -1468,6 +1635,35 @@ void graphics_link(void (*rtSym)(const char* sym, void* pc))
     rtSym("Present", Present);
     rtSym("Clear%r%g%b", Clear);
     rtSym("SetViewport%x%y%w%h", SetViewPort);
+
+    rtSym("%LoadFont$fontpath%size", LoadFont);
+    rtSym("SetFont%fontpath", SetFont);
+    rtSym("TextDraw%font%x%y$text", TextDraw);
+    rtSym("FreeFont%fontpath", FreeFont);
+
+    rtSym("%GetWindowWidth", GetWindowWidth);
+    rtSym("%GetWindowHeight", GetWindowHeight);
+
+    rtSym("SetBuffer", SetBuffer);
+    rtSym("FreeBuffer", FreeBuffer);
+
+    rtSym("%LoadModel$model", LoadModel);
+    rtSym("DrawModel%model#x#y#z", DrawModel);
+    rtSym("FreeModel%model", FreeModel);
+
+    rtSym("%CreateGameTimer", CreateGameTimer);
+    rtSym("TimeReset%timer", TimeReset);
+    rtSym("TimePause%timer", TimePause);
+    rtSym("TimeResume%timer", TimeResume);
+    rtSym("#getCurrentTime%timer", getCurrentTime);
+    rtSym("#getDeltaTime%timer", getDeltaTime);
+    rtSym("TimeIsPaused%timer", TimeIsPaused);
+    rtSym("FreeGameTimer%timer", FreeGameTimer);
+
+    rtSym("%CreateAnimation%model", CreateAnimation);
+    rtSym("PlayAnimation%anim#currTime%mode#speed%begin%end", PlayAnimation);
+    rtSym("FreeAnimation%anim", FreeAnimation);
+
     /*
     //gfx driver info
     rtSym("%CountGfxDrivers", bbCountGfxDrivers);

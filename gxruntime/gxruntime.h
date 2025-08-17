@@ -30,6 +30,20 @@ public:
 	void FreeWindow();
 	void SwapBackBuffer();
 
+	int GetWidth()
+	{
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		return rect.right - rect.left;
+	}
+
+	int GetHeight()
+	{
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		return rect.bottom - rect.top;
+	}
+
 private:
 	gxRuntime(HINSTANCE hinst, const std::string& cmd_line, HWND hwnd);
 	~gxRuntime();
