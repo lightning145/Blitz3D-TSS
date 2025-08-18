@@ -7,6 +7,7 @@ class GameTimer {
 public:
     GameTimer() {
         Reset();
+        m_firstCall = true;
     }
 
     void Reset() {
@@ -15,11 +16,12 @@ public:
         m_lastTime = 0.0;
         m_pausedTime = 0.0;
         m_paused = false;
+        m_firstCall = true;
     }
 
     void Pause() {
         if (!m_paused) {
-            m_pausedTime = GetCurrentTime();
+            m_pausedTime = getCurrentTime();
             m_paused = true;
         }
     }
@@ -44,7 +46,18 @@ public:
     }
 
     float GetDeltaTime() {
-        double currentTime = GetCurrentTime();
+        if (m_paused) {
+            return 0.0f;
+        }
+
+        double currentTime = getCurrentTime();
+
+        if (m_firstCall) {
+            m_lastTime = currentTime;
+            m_firstCall = false;
+            return 0.0f;
+        }
+
         float deltaTime = static_cast<float>(currentTime - m_lastTime);
         m_lastTime = currentTime;
         return deltaTime;
@@ -58,6 +71,7 @@ private:
     double m_lastTime;
     double m_pausedTime;
     bool m_paused;
+    bool m_firstCall;
 };
 
 #endif

@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 #include "MD_Math.h"
-#include "Input.h"
+#include "../gxruntime/gxinput.h"
 
 class Camera
 {
@@ -32,20 +32,20 @@ public:
     void Move(float cameraSpeed, float mouseSpeed)
     {
     
-        if(Input_IsKeyDown(GLFW_KEY_W))
+        if(Input_IsKeyDown(87))
             cameraPos += cameraFront * cameraSpeed;
 
-        if(Input_IsKeyDown(GLFW_KEY_S))
+        if(Input_IsKeyDown(83))
             cameraPos -= cameraFront * cameraSpeed;
 
-        if(Input_IsKeyDown(GLFW_KEY_A)) {
+        if(Input_IsKeyDown(65)) {
             MD_Math::VECTOR3 right = MD_Math::Vector3Normalized(
                 MD_Math::VectorCross(cameraFront, cameraUp)
             );
             cameraPos -= right * cameraSpeed;
         }
 
-        if(Input_IsKeyDown(GLFW_KEY_D)) {
+        if(Input_IsKeyDown(68)) {
             MD_Math::VECTOR3 right = MD_Math::Vector3Normalized(
                 MD_Math::VectorCross(cameraFront, cameraUp)
             );
@@ -55,13 +55,13 @@ public:
         pitchDelta = 0.0f;
         yawDelta = 0.0f;
         
-        if(Input_IsKeyDown(GLFW_KEY_UP))
+        if(Input_IsKeyDown(38))
             pitchDelta += mouseSpeed;
-        if(Input_IsKeyDown(GLFW_KEY_DOWN))
+        if(Input_IsKeyDown(40))
             pitchDelta -= mouseSpeed;
-        if(Input_IsKeyDown(GLFW_KEY_LEFT))
+        if(Input_IsKeyDown(37))
             yawDelta += mouseSpeed;
-        if(Input_IsKeyDown(GLFW_KEY_RIGHT))
+        if(Input_IsKeyDown(39))
             yawDelta -= mouseSpeed;
         
         if (pitchDelta != 0.0f || yawDelta != 0.0f) {
