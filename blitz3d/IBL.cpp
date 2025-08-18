@@ -82,7 +82,7 @@ IBL::IBL(const char* hdr)
                                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, CubemapTexture, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        skybox.Draw(skyboxshader); // renders a 1x1 cube
+        //skybox.Draw(skyboxshader); // renders a 1x1 cube
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -125,7 +125,7 @@ IBL::IBL(const char* hdr)
                                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        irrCube.Draw(irradianceShader);
+        //irrCube.Draw(irradianceShader);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -173,7 +173,7 @@ IBL::IBL(const char* hdr)
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            prefilterCube.Draw(prefilterShader);
+            //prefilterCube.Draw(prefilterShader);
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);   
@@ -227,5 +227,5 @@ void IBL::Draw(Cube& FinalSkyBox, Shader& FinalSkyBoxShader)
 {    
         glActiveTexture(GL_TEXTURE0); 
         glBindTexture(GL_TEXTURE_CUBE_MAP, CubemapTexture);
-        FinalSkyBox.Draw(FinalSkyBoxShader);
+        //FinalSkyBox.Draw(FinalSkyBoxShader);
 }

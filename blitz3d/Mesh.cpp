@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "ShaderFile.h"
+
 Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos, 
            std::vector<MD_Math::VECTOR2> texc, 
            std::vector<Texture> texs,
@@ -229,6 +231,9 @@ void Mesh::ComputeTangents(std::vector<Vertex>& vertices,
 
 Cube::Cube()
 {
+    shader = Shader(Cube_vs, Cube_fs);
+    shader.Link();
+
     float cubeVertices[] = {
     // positions          
     -1.0f,  1.0f, -1.0f,
@@ -289,7 +294,7 @@ Cube::~Cube()
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Cube::Draw(Shader& shader)
+void Cube::Draw()
 {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);

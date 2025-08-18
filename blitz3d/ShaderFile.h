@@ -13,4 +13,7 @@ extern const char* fb_fs;
 extern const char* model_vs;
 extern const char* model_fs;
 
+extern const char* Cube_vs;
+extern const char* Cube_fs;
+
 #endif

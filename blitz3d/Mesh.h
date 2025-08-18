@@ -60,10 +60,12 @@ class Cube
 private:
     unsigned int VAO, VBO;
 public:
+    Shader shader;
+
     Cube();
     ~Cube();
 
-    void Draw(Shader& shader);
+    void Draw();
 };
 
 class Quad

@@ -4,8 +4,8 @@
 #include "bbgraphics.h"
 
 #include "../blitz3d/Animator.h"
-
 #include "../blitz3d/Camera.h"
+#include "../blitz3d/Mesh.h"
 
 using namespace MD_Math;
 
@@ -91,6 +91,39 @@ void PositionModel(Model* model, float x, float y, float z)
     model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
 }
 
+Cube* CreateCube()
+{
+    Cube* cube = new Cube();
+    cube->shader.Use();
+    cube->shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
+    cube->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
+    cube->shader.SetMatrix("model", TranslationMatrix(0.0f, 0.0f, 0.0f));
+    return cube;
+}
+
+void DrawCube(Cube* cube)
+{
+    cube->shader.Use();
+    cube->Draw();
+}
+
+void FreeCube(Cube* cube)
+{
+    delete cube;
+}
+
+void PositionCube(Cube* cube, float x, float y, float z)
+{
+    cube->shader.Use();
+    cube->shader.SetMatrix("model", TranslationMatrix(x, y, z));
+}
+
+void ApplyCameraForCube(Camera* camera ,Cube* cube)
+{
+    cube->shader.Use();
+    cube->shader.SetMatrix("view", camera->Matrix());
+}
+
 void blitz3d_open() {
 	
 }
@@ -125,4 +158,10 @@ void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
     rtSym("SetCamera%cam#f#m", SetCamera);
     rtSym("FreeCamera%cam", FreeCamera);
     rtSym("ApplyCameraForModel%c%m", ApplyCameraForModel);
+
+    rtSym("%CreateCube", CreateCube);
+    rtSym("DrawCube%cube", DrawCube);
+    rtSym("FreeCube%cube", FreeCube);
+    rtSym("PositionCube%cube#x#y#z", PositionCube);
+    rtSym("ApplyCameraForCube%cam%cube", ApplyCameraForCube);
 }

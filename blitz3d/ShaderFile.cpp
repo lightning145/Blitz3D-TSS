@@ -99,3 +99,22 @@ const char* model_fs =
 "{\n"
 "FragColor = texture(texture_diffuse0, TexCoords);\n"
 "}\n";
+
+const char* Cube_vs = 
+"#version 460 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"void main()\n"
+"{\n"
+"gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
+"}\n";
+
+const char* Cube_fs = 
+"#version 460 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"FragColor = vec4(1.0f);\n"
+"}\n";
