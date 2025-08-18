@@ -1,7 +1,7 @@
 #include "ShaderFile.h"
 
 const char* text_vs = 
-"#version 330 core\n"
+"#version 460 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "layout (location = 1) in vec2 aTexCoords;\n"
 "out vec2 TexCoords;\n"
@@ -14,7 +14,7 @@ const char* text_vs =
 "}\n";
 
 const char* text_fs = 
-"#version 330 core\n"
+"#version 460 core\n"
 "in vec2 TexCoords;\n"
 "out vec4 color;\n"
 "uniform sampler2D text;\n"
@@ -29,7 +29,7 @@ const char* text_fs =
 Shader text1Shader = Shader(text_vs, text_fs);
 
 const char* fb_vs = 
-"#version 330 core\n"
+"#version 460 core\n"
 "layout (location = 0) in vec2 aPos;\n"
 "layout (location = 1) in vec2 aTexCoords;\n"
 "out vec2 TexCoords;\n"
@@ -40,7 +40,7 @@ const char* fb_vs =
 "}\n";
 
 const char* fb_fs = 
-"#version 330 core\n"
+"#version 460 core\n"
 "out vec4 FragColor;\n"
 "in vec2 TexCoords;\n"
 "uniform sampler2D screenTexture;\n"
@@ -50,7 +50,7 @@ const char* fb_fs =
 "}\n";
 
 const char* model_vs =
-"#version 330 core\n"
+"#version 460 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "layout (location = 1) in vec3 aNormal;\n"
 "layout (location = 2) in vec2 aTexCoords;\n"
@@ -91,7 +91,7 @@ const char* model_vs =
 "}\n";
 
 const char* model_fs = 
-"#version 330 core\n"
+"#version 460 core\n"
 "out vec4 FragColor;\n"
 "in vec2 TexCoords;\n"
 "uniform sampler2D texture_diffuse0;\n"
