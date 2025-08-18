@@ -2,6 +2,8 @@
 #include "gxruntime.h"
 #include "../gxruntime/gxutf8.h"
 
+#include "gxinput.h"
+
 #include <glad/glad.h>
 
 static const int static_ws = WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
@@ -274,6 +276,8 @@ LRESULT gxRuntime::windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	if (busy) {
 		return DefWindowProc(hwnd, msg, wparam, lparam);
 	}
+
+	Input_ProcessMessage(hwnd, msg, wparam, lparam);
 
 	PAINTSTRUCT ps;
 

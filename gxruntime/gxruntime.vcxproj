@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="gxdir.cpp" />
     <ClCompile Include="gxfilesystem.cpp" />
+    <ClCompile Include="gxinput.cpp" />
     <ClCompile Include="gxruntime.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
@@ -160,6 +161,7 @@
     <ClInclude Include="asmcoder.h" />
     <ClInclude Include="gxdir.h" />
     <ClInclude Include="gxfilesystem.h" />
+    <ClInclude Include="gxinput.h" />
     <ClInclude Include="gxruntime.h" />
     <ClInclude Include="gxtimer.h" />
     <ClInclude Include="gxutf8.h" />
