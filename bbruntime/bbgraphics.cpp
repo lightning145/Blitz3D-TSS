@@ -77,9 +77,8 @@ void Clear(int red, int green, int blue)
 Font* LoadFont(BBStr* fontpath, int size)
 {
     Font* font = new Font(fontpath->c_str(), size, ft);
-    return font;
-    delete font;
     delete fontpath;
+    return font;
 }
 
 void SetFont(Font* font)

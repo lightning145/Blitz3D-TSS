@@ -6,33 +6,106 @@
 #include "../blitz3d/Animator.h"
 #include "../blitz3d/Camera.h"
 #include "../blitz3d/Mesh.h"
+#include "../blitz3d/Light.h"
+#include "../blitz3d/Texture.h"
+
+#include <glad/glad.h>
 
 using namespace MD_Math;
 
-Camera* CreateCamera()
+Camera* camera;
+
+bool cameraRun = false;
+bool lightRun = false;
+bool normalMapRun = false;
+
+int LoadNormalMap(BBStr* path)
 {
-    Camera* camera = new Camera();
-    camera->SetPos(VECTOR3(0.0f, 0.0f, 13.0f));
-    return camera;
+    unsigned int normalMap = TextureFromFile(path->c_str());
+    delete path;
+    return normalMap;
 }
 
-void SetCamera(Camera* camera, float foot_speed, float mouse_speed)
+void ApplyNormalMapForModel(Model* model, int normal)
+{
+    model->modelShader.Use();
+    model->modelShader.SetInt("UseNormalMap", true);
+    model->modelShader.SetInt("texture_normal0", model->texCount + 1);
+    SetTexture(normal, GL_TEXTURE0 + model->texCount + 1);
+}
+
+PBR_Light* CreateLight()
+{
+    PBR_Light* p_light = new PBR_Light(VECTOR3(0.0f, 0.0f, 0.0f),
+        VECTOR3(1.0f,1.0f, 1.0f));
+
+    lightRun = true;
+
+    return p_light;
+}
+
+void SetModelAttrib(Model* model, float metaliic, float roughness)
+{
+    model->modelShader.Use();
+    model->modelShader.SetFloat("mmm", metaliic);
+    model->modelShader.SetFloat("rrr", roughness);
+}
+
+void SetLightPos(PBR_Light* light, float x, float y, float z)
+{
+    light->Position = VECTOR3(x, y, z);
+}
+
+void SetLightColor(PBR_Light* light, float r, float g, float b)
+{
+    light->Color = VECTOR3(r ,g ,b);
+}
+
+void ApplyLightForModel(PBR_Light* light, Model* model)
+{
+    model->modelShader.Use();
+    model->modelShader.SetVec3("LightColor", light->Color);
+    model->modelShader.SetVec3("LightPos", light->Position);
+}
+
+void FreeLight(PBR_Light* light)
+{
+    delete light;
+}
+
+//-------------------Entity Postion----------------
+void PositionCube(Cube* cube, float x, float y, float z)
+{
+    cube->shader.Use();
+    cube->shader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.1f, 0.1f, 0.1f));
+}
+
+void PositionModel(Model* model, float x, float y, float z)
+{
+    model->modelShader.Use();
+    model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
+}
+
+//-------------------Camera-------------------------
+void CreateCamera()
+{
+    camera = new Camera();
+    camera->SetPos(VECTOR3(0.0f, 0.0f, 1.0f));
+    cameraRun = true;
+    //return camera;
+}
+
+void SetCamera(float foot_speed, float mouse_speed)
 {
     camera->Move(foot_speed, mouse_speed);
 }
 
-void FreeCamera(Camera* camera)
+void FreeCamera()
 {
     delete camera;
 }
 
-void ApplyCameraForModel(Camera* camera, Model* model)
-{
-    //camera->SetPos(VECTOR3(0.0f, 0.0f, 13.0f));
-    model->modelShader.Use();
-    model->modelShader.SetMatrix("view", camera->Matrix());
-}
-
+//-------------------Model--------------------------
 Model* LoadModel(BBStr* modelpath)
 {
     Model* model = new Model(modelpath->c_str());
@@ -40,13 +113,19 @@ Model* LoadModel(BBStr* modelpath)
     model->modelShader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
     model->modelShader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
     model->modelShader.SetMatrix("model", TranslationMatrix(0.0f, 0.0f, 0.0f) * ScaleMatrix(0.001f, 0.001f, 0.001f));
-    return model;
     delete modelpath;
+    return model;
 }
 
 void DrawModel(Model* model)
 {
     model->modelShader.Use();
+    if(cameraRun)
+        model->modelShader.SetMatrix("view", camera->Matrix());
+        model->modelShader.SetVec3("ViewPos", camera->Pos());
+
+    if (lightRun)
+        model->modelShader.SetInt("Uselight", true);
     model->Draw();
 }
 
@@ -55,6 +134,8 @@ void FreeModel(Model* model)
     model->Free();
     delete model;
 }
+
+//-------------------Animation-----------------------
 
 Animator* CreateAnimation(Model* model)
 {
@@ -85,11 +166,7 @@ void FreeAnimation(Animator* animator)
     }
 }
 
-void PositionModel(Model* model, float x, float y, float z)
-{
-    model->modelShader.Use();
-    model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
-}
+//-------------------Cube---------------------------
 
 Cube* CreateCube()
 {
@@ -104,24 +181,14 @@ Cube* CreateCube()
 void DrawCube(Cube* cube)
 {
     cube->shader.Use();
+    if(cameraRun)
+        cube->shader.SetMatrix("view", camera->Matrix());
     cube->Draw();
 }
 
 void FreeCube(Cube* cube)
 {
     delete cube;
-}
-
-void PositionCube(Cube* cube, float x, float y, float z)
-{
-    cube->shader.Use();
-    cube->shader.SetMatrix("model", TranslationMatrix(x, y, z));
-}
-
-void ApplyCameraForCube(Camera* camera ,Cube* cube)
-{
-    cube->shader.Use();
-    cube->shader.SetMatrix("view", camera->Matrix());
 }
 
 void blitz3d_open() {
@@ -144,24 +211,33 @@ bool blitz3d_destroy() {
 }
 
 void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
+    rtSym("%LoadNormalMap$file", LoadNormalMap);
+    rtSym("ApplyNormalMapForModel%model%tex", ApplyNormalMapForModel);
+
+    rtSym("PositionModel%model#x#y#z", PositionModel);
+    rtSym("PositionCube%cube#x#y#z", PositionCube);
+
     rtSym("%LoadModel$model", LoadModel);
     rtSym("DrawModel%model", DrawModel);
     rtSym("FreeModel%model", FreeModel);
-
-    rtSym("PositionModel%model#x#y#z", PositionModel);
 
     rtSym("%CreateAnimation%model", CreateAnimation);
     rtSym("PlayAnimation%anim#currTime%mode#speed%begin%end", PlayAnimation);
     rtSym("FreeAnimation%anim", FreeAnimation);
 
-    rtSym("%CreateCamera", CreateCamera);
-    rtSym("SetCamera%cam#f#m", SetCamera);
-    rtSym("FreeCamera%cam", FreeCamera);
-    rtSym("ApplyCameraForModel%c%m", ApplyCameraForModel);
+    rtSym("CreateCamera", CreateCamera);
+    rtSym("SetCamera#f#m", SetCamera);
+    rtSym("FreeCamera", FreeCamera);
 
     rtSym("%CreateCube", CreateCube);
     rtSym("DrawCube%cube", DrawCube);
     rtSym("FreeCube%cube", FreeCube);
-    rtSym("PositionCube%cube#x#y#z", PositionCube);
-    rtSym("ApplyCameraForCube%cam%cube", ApplyCameraForCube);
+
+    rtSym("%CreateLight", CreateLight);
+    rtSym("SetLightPos%light#x#y#z", SetLightPos);
+    rtSym("SetLightColor%light#r#g#b", SetLightColor);
+
+    rtSym("ApplyLightForModel%light%model", ApplyLightForModel);
+
+    rtSym("SetModelAttrib%model#m#r", SetModelAttrib);
 }
