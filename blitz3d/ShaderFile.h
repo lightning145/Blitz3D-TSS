@@ -16,4 +16,18 @@ extern const char* model_fs;
 extern const char* Cube_vs;
 extern const char* Cube_fs;
 
+//---------------IBL------------------
+
+extern const char* ToCubemap_vs;
+extern const char* ToCubemap_fs;
+
+extern const char* irradiance_fs;
+extern const char* prefilter_fs;
+
+extern const char* brdf_vs;
+extern const char* brdf_fs;
+
+extern const char* SkyBox_vs;
+extern const char* SkyBox_fs;
+
 #endif

@@ -18,6 +18,7 @@ Camera* camera;
 bool cameraRun = false;
 bool lightRun = false;
 bool normalMapRun = false;
+bool IBLRun = false;
 
 int LoadNormalMap(BBStr* path)
 {
