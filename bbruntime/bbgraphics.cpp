@@ -57,7 +57,7 @@ void Present()
     glBindTexture(GL_TEXTURE_2D, FrameBuffer::texture_fbo);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
+    
     gx_runtime->SwapBackBuffer();
 }
 

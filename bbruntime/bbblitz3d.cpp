@@ -11,6 +11,8 @@
 
 #include <glad/glad.h>
 
+#include "../blitz3d/IBL.h"
+
 using namespace MD_Math;
 
 Camera* camera;
@@ -20,6 +22,7 @@ bool lightRun = false;
 bool normalMapRun = false;
 bool IBLRun = false;
 
+//-----------------Normal Map--------------------
 int LoadNormalMap(BBStr* path)
 {
     unsigned int normalMap = TextureFromFile(path->c_str());
@@ -171,7 +174,8 @@ void FreeAnimation(Animator* animator)
 
 Cube* CreateCube()
 {
-    Cube* cube = new Cube();
+    Cube* cube = new Cube(Cube_vs, Cube_fs);
+    cube->shader.Link();
     cube->shader.Use();
     cube->shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
     cube->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
@@ -190,6 +194,55 @@ void DrawCube(Cube* cube)
 void FreeCube(Cube* cube)
 {
     delete cube;
+}
+
+//---------IBL--------------------------}
+IBL* CreateSkyBoxIBL(BBStr* hdr)
+{
+    IBL* ibl = new IBL(hdr->c_str());
+    delete hdr;
+    return ibl;
+}
+
+void DrawSkyBoxIBL(IBL* ibl)
+{
+    GLboolean depthMask;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+    GLint depthFunc;
+    glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
+
+    glDepthMask(GL_FALSE);
+    glDepthFunc(GL_LEQUAL);
+
+    ibl->FinalSkyBox->shader.Use();
+    ibl->FinalSkyBox->shader.SetMatrix("view", camera->Matrix());
+    ibl->FinalSkyBox->shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
+    ibl->FinalSkyBox->shader.SetInt("environmentMap", 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->envCubemap);
+    ibl->FinalSkyBox->Draw();
+
+    glDepthMask(depthMask);
+    glDepthFunc(depthFunc);
+}
+
+void FreeSkyBoxIBL(IBL* ibl)
+{
+    delete ibl;
+}
+
+void ApplySkyBoxIBLForModel(IBL* ibl, Model* model)
+{
+    model->modelShader.Use();
+    model->modelShader.SetInt("irradianceMap", model->texCount + 2);
+    model->modelShader.SetInt("prefilterMap", model->texCount + 3);
+    model->modelShader.SetInt("brdfLUT", model->texCount + 4);
+    model->modelShader.SetInt("UseIBL", true);
+
+    SetCubeTexture(ibl->irradianceMap, GL_TEXTURE0 + model->texCount + 2);
+    SetCubeTexture(ibl->prefilterMap, GL_TEXTURE0 + model->texCount + 3);
+    SetTexture(ibl->brdfLUTTexture, GL_TEXTURE0 + model->texCount + 4);
 }
 
 void blitz3d_open() {
@@ -212,6 +265,11 @@ bool blitz3d_destroy() {
 }
 
 void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
+    rtSym("%CreateSkyBoxIBL$hdr", CreateSkyBoxIBL);
+    rtSym("DrawSkyBoxIBL%ibl", DrawSkyBoxIBL);
+    rtSym("FreeSkyBoxIBL%ibl", FreeSkyBoxIBL);
+    rtSym("ApplySkyBoxIBLForModel%ibl%model", ApplySkyBoxIBLForModel);
+
     rtSym("%LoadNormalMap$file", LoadNormalMap);
     rtSym("ApplyNormalMapForModel%model%tex", ApplyNormalMapForModel);
 

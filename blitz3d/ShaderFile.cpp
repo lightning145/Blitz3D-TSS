@@ -21,7 +21,7 @@ const char* text_fs =
 "uniform vec3 textColor;\n"
 "void main() {\n"
 "float alpha = texture(text, TexCoords).r;\n"
-"if (alpha < 0.1) discard;\n"
+"if (alpha < 0.2) discard;\n"
 "vec4 sampled = vec4(1.0, 1.0, 1.0, alpha);\n"
 "color = vec4(textColor, 1.0) * sampled;\n"
 "}\n";
@@ -46,7 +46,8 @@ const char* fb_fs =
 "uniform sampler2D screenTexture;\n"
 "void main()\n"
 "{\n"
-"FragColor = texture(screenTexture, TexCoords);\n"
+"       vec3 result = texture(screenTexture, TexCoords).rgb;\n"
+"       FragColor = vec4(result ,1.0);\n"
 "}\n";
 
 const char* model_vs =
@@ -124,6 +125,9 @@ const char* model_fs =
 
 "uniform sampler2D texture_diffuse0;\n"
 "uniform sampler2D texture_normal0;\n"
+"uniform samplerCube irradianceMap;\n"
+"uniform samplerCube prefilterMap;\n"
+"uniform sampler2D   brdfLUT;\n"
 
 "uniform vec3 LightPos;\n"
 "uniform vec3 LightColor;\n"
@@ -131,6 +135,7 @@ const char* model_fs =
 
 "uniform bool Uselight = false;\n"
 "uniform bool UseNormalMap = false;\n"
+"uniform bool UseIBL = false;\n"
 
 "uniform float mmm;"
 "uniform float rrr;"
@@ -162,7 +167,7 @@ const char* model_fs =
 "       vec3 albedo = pow(ModelColor , vec3(2.2));\n"
 "        float metallic = mmm;\n"
 "        float roughness = rrr;\n"
-"        float ao = 0.0f;\n"
+"        float ao = 1.0f;\n"
 
 "        vec3 R = reflect(-ViewDir, norm);\n"
 
@@ -192,13 +197,30 @@ const char* model_fs =
 
 "                Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
 
-"       vec3 ambient = vec3(0.03) * albedo * ao;\n"
+"        vec3 ambient = vec3(1.0);\n"
+"        vec3 irradiance = texture(irradianceMap, norm).rgb; \n"
+"        vec3 diffuse = irradiance * albedo; \n"
+"        const float MAX_REFLECTION_LOD = 4.0; \n"
+"        vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb; \n"
+"        vec2 brdf = texture(brdfLUT, vec2(max(dot(norm, ViewDir), 0.0), roughness)).rg; \n"
+
+"       if(UseIBL)\n"
+"       {\n"
+"             kS = fresnelSchlickRoughness(max(dot(norm, ViewDir), 0.0), F0, roughness);\n"
+"             kD = vec3(1.0) - kS; \n"
+"             kD *= 1.0 - metallic; \n"
+"             specular = prefilteredColor * (F * brdf.x + brdf.y);\n"
+"             ambient = (kD * diffuse + specular) * ao; \n"
+"       }\n"
+"       else {\n"
+"            ambient = vec3(0.03) * albedo * ao;\n"
+"       }\n"
 
 "       vec3 result = ambient + Lo;\n"
 
-"       vec3 mapped = result / (result + vec3(1.0));// HDR\n"
-"       mapped = pow(mapped, vec3(1.0 / 2.2));// Gamma\n"
-"       FragColor = vec4(mapped, 1.0);\n"
+"       result = result / (result + vec3(1.0));// HDR\n"
+"       result = pow(result, vec3(1.0 / 2.2));// Gamma\n"
+"       FragColor = vec4(result, 1.0);\n"
 "    }\n"
 "    else {\n"
 "       FragColor = vec4(ModelColor, 1.0); \n"
@@ -224,8 +246,14 @@ const char* model_fs =
 "float GeometrySchlickGGX(float NdotV, float roughness)\n"
 "{\n"
 "    float r = (roughness + 1.0);\n"
-"    float k = (r*r) / 8.0;\n"
-"    //float k = (r * r) / 2.0;\n"
+"    float k = 1.0;\n"
+"       if(UseIBL)\n"
+"       {\n"
+"           k = (r * r) / 2.0;\n"
+"       }\n"
+"       else {\n"
+"           k = (r*r) / 8.0;\n"
+"       }\n"
 
 "    float nom = NdotV;\n"
 "    float denom = NdotV * (1.0 - k) + k;\n"

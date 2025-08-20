@@ -22,7 +22,6 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderFile.cpp" />
-    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Texture.c" />
   </ItemGroup>
   <ItemGroup>
@@ -42,7 +41,6 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderFile.h" />
-    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>

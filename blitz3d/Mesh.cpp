@@ -7,6 +7,7 @@
 
 #include "ShaderFile.h"
 
+/*
 Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos, 
            std::vector<MD_Math::VECTOR2> texc, 
            std::vector<Texture> texs,
@@ -81,7 +82,7 @@ Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos,
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
 
     ind = indices.size();
-}
+}*/
 
 Mesh::Mesh(std::vector<Vertex> vers,
         std::vector<Texture> texs,
@@ -229,10 +230,9 @@ void Mesh::ComputeTangents(std::vector<Vertex>& vertices,
     }
 }
 
-Cube::Cube()
+Cube::Cube(const char* vs, const char* fs)
 {
-    shader = Shader(Cube_vs, Cube_fs);
-    shader.Link();
+    shader = Shader(vs, fs);
 
     float cubeVertices[] = {
     // positions          

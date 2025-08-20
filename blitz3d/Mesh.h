@@ -37,10 +37,11 @@ private:
           
 public:
     Mesh(){};
+    /*
     Mesh(std::vector<MD_Math::VECTOR3> pos, 
         std::vector<MD_Math::VECTOR2> texc, 
         std::vector<Texture> texs,
-        std::vector<unsigned int> indices);
+        std::vector<unsigned int> indices);*/
 
     Mesh(
         std::vector<Vertex> vers,
@@ -62,7 +63,8 @@ private:
 public:
     Shader shader;
 
-    Cube();
+    Cube() {};
+    Cube(const char* vs, const char* fs);
     ~Cube();
 
     void Draw();
