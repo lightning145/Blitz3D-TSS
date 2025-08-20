@@ -22,6 +22,34 @@ bool lightRun = false;
 bool normalMapRun = false;
 bool IBLRun = false;
 
+MATRIX projection = IdentityMatrix();
+
+//-------------------Camera-------------------------
+void CreateCamera()
+{
+    camera = new Camera();
+    camera->SetPos(VECTOR3(0.0f, 0.0f, 1.0f));
+    cameraRun = true;
+    //return camera;
+}
+
+void SetCameraRange(float c_near, float c_far)
+{
+    projection = PerspectiveMatrixRH(
+        AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight() ,
+        c_near, c_far);
+}
+
+void SetCamera(float foot_speed, float mouse_speed)
+{
+    camera->Move(foot_speed, mouse_speed);
+}
+
+void FreeCamera()
+{
+    delete camera;
+}
+
 //-----------------Normal Map--------------------
 int LoadNormalMap(BBStr* path)
 {
@@ -38,10 +66,29 @@ void ApplyNormalMapForModel(Model* model, int normal)
     SetTexture(normal, GL_TEXTURE0 + model->texCount + 1);
 }
 
+void ApplyNormalMapForCube(Cube* model, int normal)
+{
+    model->shader.Use();
+    model->shader.SetInt("UseNormalMap", true);
+    model->shader.SetInt("texture_normal0", 1);
+    SetTexture(normal, GL_TEXTURE0 + 1);
+}
+
+void ApplyNormalMapForQuad(Quad* model, int normal)
+{
+    model->shader.Use();
+    model->shader.SetInt("UseNormalMap", true);
+    model->shader.SetInt("texture_normal0", 1);
+    SetTexture(normal, GL_TEXTURE0 + 1);
+}
+
+//-----------------------Light--------------------------------------
+
 PBR_Light* CreateLight()
 {
     PBR_Light* p_light = new PBR_Light(VECTOR3(0.0f, 0.0f, 0.0f),
-        VECTOR3(1.0f,1.0f, 1.0f));
+        VECTOR3(1.0f,1.0f, 1.0f),
+        VECTOR3(0.0f, 0.0f, 0.0f));
 
     lightRun = true;
 
@@ -55,6 +102,25 @@ void SetModelAttrib(Model* model, float metaliic, float roughness)
     model->modelShader.SetFloat("rrr", roughness);
 }
 
+void SetCubeAttrib(Cube* model, float metaliic, float roughness)
+{
+    model->shader.Use();
+    model->shader.SetFloat("mmm", metaliic);
+    model->shader.SetFloat("rrr", roughness);
+}
+
+void SetQuadAttrib(Quad* model, float metaliic, float roughness)
+{
+    model->shader.Use();
+    model->shader.SetFloat("mmm", metaliic);
+    model->shader.SetFloat("rrr", roughness);
+}
+
+void SetLightDirectional(PBR_Light* light, float x, float y, float z)
+{
+    light->Directional = VECTOR3(x, y, z);
+}
+
 void SetLightPos(PBR_Light* light, float x, float y, float z)
 {
     light->Position = VECTOR3(x, y, z);
@@ -65,11 +131,46 @@ void SetLightColor(PBR_Light* light, float r, float g, float b)
     light->Color = VECTOR3(r ,g ,b);
 }
 
+void EnableDirectionLight(PBR_Light* light ,Model* model)
+{
+    model->modelShader.Use();
+    model->modelShader.SetInt("UseDirection", true);
+    model->modelShader.SetVec3("LightDirectional", light->Directional);
+}
+
+void EnableDirectionLightCube(PBR_Light* light, Cube* model)
+{
+    model->shader.Use();
+    model->shader.SetInt("UseDirection", true);
+    model->shader.SetVec3("LightDirectional", light->Directional);
+}
+
+void EnableDirectionLightQuad(PBR_Light* light, Quad* model)
+{
+    model->shader.Use();
+    model->shader.SetInt("UseDirection", true);
+    model->shader.SetVec3("LightDirectional", light->Directional);
+}
+
 void ApplyLightForModel(PBR_Light* light, Model* model)
 {
     model->modelShader.Use();
     model->modelShader.SetVec3("LightColor", light->Color);
     model->modelShader.SetVec3("LightPos", light->Position);
+}
+
+void ApplyLightForCube(PBR_Light* light, Cube* model)
+{
+    model->shader.Use();
+    model->shader.SetVec3("LightColor", light->Color);
+    model->shader.SetVec3("LightPos", light->Position);
+}
+
+void ApplyLightForQuad(PBR_Light* light, Quad* model)
+{
+    model->shader.Use();
+    model->shader.SetVec3("LightColor", light->Color);
+    model->shader.SetVec3("LightPos", light->Position);
 }
 
 void FreeLight(PBR_Light* light)
@@ -90,31 +191,12 @@ void PositionModel(Model* model, float x, float y, float z)
     model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
 }
 
-//-------------------Camera-------------------------
-void CreateCamera()
-{
-    camera = new Camera();
-    camera->SetPos(VECTOR3(0.0f, 0.0f, 1.0f));
-    cameraRun = true;
-    //return camera;
-}
-
-void SetCamera(float foot_speed, float mouse_speed)
-{
-    camera->Move(foot_speed, mouse_speed);
-}
-
-void FreeCamera()
-{
-    delete camera;
-}
-
 //-------------------Model--------------------------
 Model* LoadModel(BBStr* modelpath)
 {
     Model* model = new Model(modelpath->c_str());
     model->modelShader.Use();
-    model->modelShader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
+    model->modelShader.SetMatrix("projection", projection);
     model->modelShader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
     model->modelShader.SetMatrix("model", TranslationMatrix(0.0f, 0.0f, 0.0f) * ScaleMatrix(0.001f, 0.001f, 0.001f));
     delete modelpath;
@@ -177,7 +259,7 @@ Cube* CreateCube()
     Cube* cube = new Cube(Cube_vs, Cube_fs);
     cube->shader.Link();
     cube->shader.Use();
-    cube->shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
+    cube->shader.SetMatrix("projection", projection);
     cube->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
     cube->shader.SetMatrix("model", TranslationMatrix(0.0f, 0.0f, 0.0f));
     return cube;
@@ -216,7 +298,7 @@ void DrawSkyBoxIBL(IBL* ibl)
 
     ibl->FinalSkyBox->shader.Use();
     ibl->FinalSkyBox->shader.SetMatrix("view", camera->Matrix());
-    ibl->FinalSkyBox->shader.SetMatrix("projection", PerspectiveMatrixRH(AngularToRadian(45.0f), (float)gx_runtime->GetWidth() / (float)gx_runtime->GetHeight(), 0.1f, 100.0f));
+    ibl->FinalSkyBox->shader.SetMatrix("projection", projection);
     ibl->FinalSkyBox->shader.SetInt("environmentMap", 0);
 
     glActiveTexture(GL_TEXTURE0);
@@ -245,6 +327,73 @@ void ApplySkyBoxIBLForModel(IBL* ibl, Model* model)
     SetTexture(ibl->brdfLUTTexture, GL_TEXTURE0 + model->texCount + 4);
 }
 
+void ApplySkyBoxIBLForQuad(IBL* ibl, Quad* model)
+{
+    model->shader.Use();
+    model->shader.SetInt("irradianceMap", 2);
+    model->shader.SetInt("prefilterMap", 3);
+    model->shader.SetInt("brdfLUT", 4);
+    model->shader.SetInt("UseIBL", true);
+
+    SetCubeTexture(ibl->irradianceMap, GL_TEXTURE0 + 2);
+    SetCubeTexture(ibl->prefilterMap, GL_TEXTURE0 + 3);
+    SetTexture(ibl->brdfLUTTexture, GL_TEXTURE0 + 4);
+}
+
+void ApplySkyBoxIBLForCube(IBL* ibl, Cube* model)
+{
+    model->shader.Use();
+    model->shader.SetInt("irradianceMap", 2);
+    model->shader.SetInt("prefilterMap", 3);
+    model->shader.SetInt("brdfLUT", 4);
+    model->shader.SetInt("UseIBL", true);
+
+    SetCubeTexture(ibl->irradianceMap, GL_TEXTURE0 + 2);
+    SetCubeTexture(ibl->prefilterMap, GL_TEXTURE0 + 3);
+    SetTexture(ibl->brdfLUTTexture, GL_TEXTURE0 + 4);
+}
+
+//----------------------Quad---------------------
+Quad* CreateQuad()
+{
+    Quad* quad = new Quad(Cube_vs, Cube_fs);
+    quad->shader.Link();
+    quad->shader.Use();
+    quad->shader.SetMatrix("projection", projection);
+    quad->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
+    quad->shader.SetMatrix("model", TranslationMatrix(0.0f, 0.0f, 0.0f));
+    return quad;
+}
+
+void DrawQuad(Quad* quad)
+{
+    quad->shader.Use();
+    if (cameraRun)
+        quad->shader.SetMatrix("view", camera->Matrix());
+    quad->Draw();
+}
+
+void FreeQuad(Quad* quad)
+{
+    delete quad;
+}
+
+void SetQuad(Quad* quad ,float x, float y, float z, 
+                         float sx, float sy, float sz,
+                         float rx, float ry, float rz)
+{
+    quad->shader.Use();
+    quad->shader.SetMatrix("model",
+        TranslationMatrix(x, y, z) *
+        RotationMatrix(AngularToRadian(rx), 'X') * RotationMatrix(AngularToRadian(ry), 'Y') * RotationMatrix(AngularToRadian(rz), 'Z')
+        * ScaleMatrix(sx, sy, sz)
+        );
+}
+
+//-------------------Shadow--------------------
+
+
+
 void blitz3d_open() {
 	
 }
@@ -269,9 +418,13 @@ void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
     rtSym("DrawSkyBoxIBL%ibl", DrawSkyBoxIBL);
     rtSym("FreeSkyBoxIBL%ibl", FreeSkyBoxIBL);
     rtSym("ApplySkyBoxIBLForModel%ibl%model", ApplySkyBoxIBLForModel);
+    rtSym("ApplySkyBoxIBLForCube%ibl%model", ApplySkyBoxIBLForCube);
+    rtSym("ApplySkyBoxIBLForQuad%ibl%model", ApplySkyBoxIBLForQuad);
 
     rtSym("%LoadNormalMap$file", LoadNormalMap);
     rtSym("ApplyNormalMapForModel%model%tex", ApplyNormalMapForModel);
+    rtSym("ApplyNormalMapForCube%model%tex", ApplyNormalMapForCube);
+    rtSym("ApplyNormalMapForQuad%model%tex", ApplyNormalMapForQuad);
 
     rtSym("PositionModel%model#x#y#z", PositionModel);
     rtSym("PositionCube%cube#x#y#z", PositionCube);
@@ -287,16 +440,28 @@ void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
     rtSym("CreateCamera", CreateCamera);
     rtSym("SetCamera#f#m", SetCamera);
     rtSym("FreeCamera", FreeCamera);
+    rtSym("SetCameraRange#n#f", SetCameraRange);
 
     rtSym("%CreateCube", CreateCube);
     rtSym("DrawCube%cube", DrawCube);
     rtSym("FreeCube%cube", FreeCube);
 
+    rtSym("%CreateQuad", CreateQuad);
+    rtSym("DrawQuad%quad", DrawQuad);
+    rtSym("FreeQuad%quad", FreeQuad);
+    rtSym("SetQuad%quad#x#y#z#sx#sy#sz#rx#ry#rz", SetQuad);
+
     rtSym("%CreateLight", CreateLight);
     rtSym("SetLightPos%light#x#y#z", SetLightPos);
     rtSym("SetLightColor%light#r#g#b", SetLightColor);
+    rtSym("SetLightDirectional%light#x#y#z", SetLightDirectional);
+    rtSym("EnableDirectionLight%pbr%model", EnableDirectionLight);
+    rtSym("EnableDirectionLightCube%pbr%model", EnableDirectionLightCube);
+    rtSym("EnableDirectionLightQuad%pbr%model", EnableDirectionLightQuad);
 
     rtSym("ApplyLightForModel%light%model", ApplyLightForModel);
+    rtSym("ApplyLightForCube%light%model", ApplyLightForCube);
+    rtSym("ApplyLightForQuad%light%model", ApplyLightForQuad);
 
     rtSym("SetModelAttrib%model#m#r", SetModelAttrib);
 }

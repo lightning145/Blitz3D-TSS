@@ -30,4 +30,8 @@ extern const char* brdf_fs;
 extern const char* SkyBox_vs;
 extern const char* SkyBox_fs;
 
+//--------------Shadow---------------
+
+extern const char* DepthMap_vs;
+extern const char* DepthMap_fs;
 #endif

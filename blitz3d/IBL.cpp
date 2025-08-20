@@ -182,9 +182,8 @@ IBL::IBL(const char* hdrfile)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    Quad brdf_quad = Quad();
-    Shader brdfShader = Shader(brdf_vs, brdf_fs);
-    brdfShader.Link();
+    Quad brdf_quad = Quad(brdf_vs, brdf_fs);
+    brdf_quad.shader.Link();
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
@@ -192,9 +191,9 @@ IBL::IBL(const char* hdrfile)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
 
     glViewport(0, 0, 512, 512);
-    brdfShader.Use();
+    brdf_quad.shader.Use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    brdf_quad.Draw(brdfShader);
+    brdf_quad.Draw();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

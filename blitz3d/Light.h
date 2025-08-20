@@ -45,6 +45,7 @@ typedef struct PBR_Light
 {
     MD_Math::VECTOR3 Position;
     MD_Math::VECTOR3 Color;
+    MD_Math::VECTOR3 Directional;
 } PBR_Light;
 
 #endif

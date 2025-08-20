@@ -13,6 +13,8 @@
 #include "../blitz3d/stb_image.h"
 #include "../blitz3d/GameTimer.h"
 
+#include <memory>
+
 using namespace MD_Math;
 
 FT_Library ft;

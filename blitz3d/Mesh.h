@@ -59,10 +59,9 @@ public:
 class Cube
 {
 private:
-    unsigned int VAO, VBO;
+    Mesh mesh;
 public:
     Shader shader;
-
     Cube() {};
     Cube(const char* vs, const char* fs);
     ~Cube();
@@ -73,31 +72,20 @@ public:
 class Quad
 {
 private:
-    unsigned int VAO, VBO;
+    Mesh mesh;
 public:
-    Quad();
+    Shader shader;
+    Quad() {};
+    Quad(const char* vs, const char* fs);
     ~Quad();
 
-    void Draw(Shader& shader);
+    void Draw();
 };
 
 class Sphere
 {
 private:
-    unsigned int VAO, VBO, EBO;
-    struct Vertex {
-        MD_Math::VECTOR3 position;
-        MD_Math::VECTOR3 normal;
-        MD_Math::VECTOR2 texCoords;
-    };
-
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-
-    const float radius = 1.0f;
-    const int sectors = 36;
-    const int stacks = 18;
-
+    Mesh mesh;
 public:
     Sphere();
     ~Sphere();
