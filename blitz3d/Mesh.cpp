@@ -8,31 +8,31 @@
 #include "ShaderFile.h"
 
 /*
-Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos, 
-           std::vector<MD_Math::VECTOR2> texc, 
+Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos,
+           std::vector<MD_Math::VECTOR2> texc,
            std::vector<Texture> texs,
             std::vector<unsigned int> indices)
 {
     Vertex temp = {
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
-        MD_Math::VECTOR2(0.0f, 0.0f), 
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
+        MD_Math::VECTOR2(0.0f, 0.0f),
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::IVECTOR4(0, 0, 0, 0),
         MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f)};
 
     MD_Math::VECTOR3 normal(0.0f, 0.0f, 0.0f);
-    
+
     int j = 0, c = 0;
     for(int i = 0; i < pos.size(); i++)
     {
         if(i % 4 == 0 && i != 0)
         {
-            j += 1; 
+            j += 1;
             c += 4;
         }
-            
+
         temp.Position = pos[i];
         normal = -Vector3Normalized(
             VectorCross(
@@ -77,7 +77,7 @@ Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos,
 
     glEnableVertexAttribArray(5);
     glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIDs));
-        
+
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
 
@@ -85,19 +85,19 @@ Mesh::Mesh(std::vector<MD_Math::VECTOR3> pos,
 }*/
 
 Mesh::Mesh(std::vector<Vertex> vers,
-        std::vector<Texture> texs,
-        std::vector<unsigned int> indices)
+    std::vector<Texture> texs,
+    std::vector<unsigned int> indices)
 {
     Vertex temp = {
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
-        MD_Math::VECTOR2(0.0f, 0.0f), 
-        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f), 
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
+        MD_Math::VECTOR2(0.0f, 0.0f),
+        MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::IVECTOR4(0, 0, 0, 0),
-        MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f)};
-    
-    for(int i = 0; i < vers.size(); i++)
+        MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f) };
+
+    for (int i = 0; i < vers.size(); i++)
     {
         temp.Position = vers[i].Position;
         temp.Normals = vers[i].Normals;
@@ -108,10 +108,10 @@ Mesh::Mesh(std::vector<Vertex> vers,
         temp.Weights = vers[i].Weights;
         vertices.push_back(temp);
     }
-    
+
     textures = texs;
     texCount = texs.size();
-    
+
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
@@ -140,7 +140,7 @@ Mesh::Mesh(std::vector<Vertex> vers,
 
     glEnableVertexAttribArray(5);
     glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIDs));
-        
+
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
 
@@ -149,33 +149,33 @@ Mesh::Mesh(std::vector<Vertex> vers,
 
 Mesh::~Mesh()
 {
-   
+
 }
 
 void Mesh::Free()
 {
-   glDeleteBuffers(1, &VBO);
-   glDeleteBuffers(1, &EBO);
-   glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
 
-   for(unsigned int i = 0; i < textures.size(); i++)
-   {
+    for (unsigned int i = 0; i < textures.size(); i++)
+    {
         glDeleteTextures(1, &textures[i].id);
-   }
+    }
 }
 
 void Mesh::Draw(Shader& shader)
 {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
-    for(unsigned int i = 0; i < textures.size(); i++)
+    for (unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i);
         std::string number;
         std::string name = textures[i].type;
-        if(name == "texture_diffuse")
+        if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);
-        else if(name == "texture_specular")
+        else if (name == "texture_specular")
             number = std::to_string(specularNr++);
 
         shader.SetInt((name + number).c_str(), i);
@@ -188,42 +188,42 @@ void Mesh::Draw(Shader& shader)
     glBindVertexArray(0);
 }
 
-void Mesh::ComputeTangents(std::vector<Vertex>& vertices, 
-                      const std::vector<unsigned int>& indices)
+void ComputeTangents(std::vector<Vertex>& vertices,
+    const std::vector<unsigned int>& indices)
 {
     for (size_t i = 0; i < indices.size(); i += 3) {
         Vertex& v0 = vertices[indices[i]];
-        Vertex& v1 = vertices[indices[i+1]];
-        Vertex& v2 = vertices[indices[i+2]];
-        
+        Vertex& v1 = vertices[indices[i + 1]];
+        Vertex& v2 = vertices[indices[i + 2]];
+
         MD_Math::VECTOR3 edge1 = v1.Position - v0.Position;
         MD_Math::VECTOR3 edge2 = v2.Position - v0.Position;
-        
+
         MD_Math::VECTOR2 deltaUV1 = v1.TexCoords - v0.TexCoords;
         MD_Math::VECTOR2 deltaUV2 = v2.TexCoords - v0.TexCoords;
-        
+
         float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-        
+
         MD_Math::VECTOR3 tangent(0.0f, 0.0f, 0.0f);
         MD_Math::VECTOR3 bitangent(0.0f, 0.0f, 0.0f);
-        
+
         tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
         tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
         tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-        
+
         bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
         bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
         bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-        
+
         v0.Tangent += tangent;
         v1.Tangent += tangent;
         v2.Tangent += tangent;
-        
+
         v0.Bitangent += bitangent;
         v1.Bitangent += bitangent;
         v2.Bitangent += bitangent;
     }
-    
+
     for (auto& vertex : vertices) {
         vertex.Tangent = MD_Math::Vector3Normalized(vertex.Tangent);
         vertex.Bitangent = MD_Math::Vector3Normalized(vertex.Bitangent);
@@ -239,51 +239,61 @@ Cube::Cube(const char* vs, const char* fs)
     std::vector<Texture> textures;
 
     float cubeVertices[] = {
-        // positions          
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
 
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+        -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+         1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+         -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+         -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+         -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
+          1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+          1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+          1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+          1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
+          -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+           1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+           1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+          -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+
+          
+          -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+           1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+           1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+          -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f
     };
 
-    for (int i = 0; i < 36; ++i) {
+    unsigned int cubeIndices[] = {
+
+        0, 1, 2,
+        2, 3, 0,
+
+        4, 5, 6,
+        6, 7, 4,
+
+        8, 9, 10,
+        10, 11, 8,
+
+        12, 13, 14,
+        14, 15, 12,
+
+        16, 17, 18,
+        18, 19, 16,
+
+        20, 21, 22,
+        22, 23, 20
+    };
+
+    for (int i = 0; i < 24; ++i) {
         Vertex vertex = {
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
@@ -293,16 +303,21 @@ Cube::Cube(const char* vs, const char* fs)
         MD_Math::IVECTOR4(0, 0, 0, 0),
         MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f) };
 
-        vertex.Position = MD_Math::VECTOR3(cubeVertices[i * 3], cubeVertices[i * 3 + 1], cubeVertices[i * 3 + 2]);
-        vertex.Normals = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
-        vertex.TexCoords = MD_Math::VECTOR2(0.0f, 0.0f);
+        vertex.Position = MD_Math::VECTOR3(cubeVertices[i * 8], cubeVertices[i * 8 + 1], cubeVertices[i * 8 + 2]);
+        vertex.Normals = MD_Math::VECTOR3(cubeVertices[i * 8 + 3], cubeVertices[i * 8 + 4], cubeVertices[i * 8 + 5]);
+        vertex.TexCoords = MD_Math::VECTOR2(cubeVertices[i * 8 + 6], cubeVertices[i * 8 + 7]);
         vertex.Tangent = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
         vertex.Bitangent = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
         vertex.BoneIDs = MD_Math::IVECTOR4(0, 0, 0, 0);
         vertex.Weights = MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f);
         vertices.push_back(vertex);
-        indices.push_back(i);
     }
+
+    for (int i = 0; i < 36; ++i) {
+        indices.push_back(cubeIndices[i]);
+    }
+
+    ComputeTangents(vertices, indices);
 
     mesh = Mesh(vertices, textures, indices);
 }
@@ -326,11 +341,10 @@ Quad::Quad(const char* vs, const char* fs)
     std::vector<Texture> textures;
 
     float quadVertices[] = {
-        // positions        // texture Coords
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
     };
 
     for (int i = 0; i < 4; ++i) {
@@ -343,9 +357,9 @@ Quad::Quad(const char* vs, const char* fs)
         MD_Math::IVECTOR4(0, 0, 0, 0),
         MD_Math::VECTOR4(0.0f, 0.0f, 0.0f, 0.0f) };
 
-        vertex.Position = MD_Math::VECTOR3(quadVertices[i * 5], quadVertices[i * 5 + 1], quadVertices[i * 5 + 2]);
-        vertex.Normals = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
-        vertex.TexCoords = MD_Math::VECTOR2(quadVertices[i * 5 + 3], quadVertices[i * 5 + 4]);
+        vertex.Position = MD_Math::VECTOR3(quadVertices[i * 8], quadVertices[i * 8 + 1], quadVertices[i * 8 + 2]);
+        vertex.Normals = MD_Math::VECTOR3(quadVertices[i * 8 + 3], quadVertices[i * 8 + 4], quadVertices[i * 8 + 5]);
+        vertex.TexCoords = MD_Math::VECTOR2(quadVertices[i * 8 + 6], quadVertices[i * 8 + 7]);
         vertex.Tangent = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
         vertex.Bitangent = MD_Math::VECTOR3(0.0f, 0.0f, 0.0f);
         vertex.BoneIDs = MD_Math::IVECTOR4(0, 0, 0, 0);
@@ -354,6 +368,8 @@ Quad::Quad(const char* vs, const char* fs)
     }
 
     indices = { 0, 1, 2, 2, 1, 3 };
+
+    ComputeTangents(vertices, indices);
 
     mesh = Mesh(vertices, textures, indices);
 }
@@ -386,7 +402,7 @@ Sphere::Sphere()
         for (int j = 0; j <= sectors; ++j) {
             float sectorAngle = j * (2 * MD_MATH_PI / sectors);
 
-            Vertex vertex{
+            Vertex vertex = {
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::VECTOR3(0.0f, 0.0f, 0.0f),
         MD_Math::VECTOR2(0.0f, 0.0f),
@@ -431,6 +447,8 @@ Sphere::Sphere()
             }
         }
     }
+
+    ComputeTangents(vertices, indices);
 
     mesh = Mesh(vertices, textures, indices);
 }

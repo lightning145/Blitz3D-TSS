@@ -155,22 +155,28 @@ void EnableDirectionLightQuad(PBR_Light* light, Quad* model)
 void ApplyLightForModel(PBR_Light* light, Model* model)
 {
     model->modelShader.Use();
+    if (lightRun)
+        model->modelShader.SetInt("Uselight", true);
     model->modelShader.SetVec3("LightColor", light->Color);
     model->modelShader.SetVec3("LightPos", light->Position);
 }
 
-void ApplyLightForCube(PBR_Light* light, Cube* model)
+void ApplyLightForCube(PBR_Light* light, Cube* cube)
 {
-    model->shader.Use();
-    model->shader.SetVec3("LightColor", light->Color);
-    model->shader.SetVec3("LightPos", light->Position);
+    cube->shader.Use();
+    if (lightRun)
+        cube->shader.SetInt("Uselight", true);
+    cube->shader.SetVec3("LightColor", light->Color);
+    cube->shader.SetVec3("LightPos", light->Position);
 }
 
-void ApplyLightForQuad(PBR_Light* light, Quad* model)
+void ApplyLightForQuad(PBR_Light* light, Quad* quad)
 {
-    model->shader.Use();
-    model->shader.SetVec3("LightColor", light->Color);
-    model->shader.SetVec3("LightPos", light->Position);
+    quad->shader.Use();
+    if (lightRun)
+        quad->shader.SetInt("Uselight", true);
+    quad->shader.SetVec3("LightColor", light->Color);
+    quad->shader.SetVec3("LightPos", light->Position);
 }
 
 void FreeLight(PBR_Light* light)
@@ -207,11 +213,8 @@ void DrawModel(Model* model)
 {
     model->modelShader.Use();
     if(cameraRun)
-        model->modelShader.SetMatrix("view", camera->Matrix());
+        model->modelShader.SetMatrix("view", camera->Matrix()); 
         model->modelShader.SetVec3("ViewPos", camera->Pos());
-
-    if (lightRun)
-        model->modelShader.SetInt("Uselight", true);
     model->Draw();
 }
 
@@ -269,7 +272,8 @@ void DrawCube(Cube* cube)
 {
     cube->shader.Use();
     if(cameraRun)
-        cube->shader.SetMatrix("view", camera->Matrix());
+        cube->shader.SetMatrix("view", camera->Matrix()); 
+        cube->shader.SetVec3("ViewPos", camera->Pos());
     cube->Draw();
 }
 
@@ -369,7 +373,9 @@ void DrawQuad(Quad* quad)
 {
     quad->shader.Use();
     if (cameraRun)
-        quad->shader.SetMatrix("view", camera->Matrix());
+        quad->shader.SetMatrix("view", camera->Matrix()); 
+        quad->shader.SetVec3("ViewPos", camera->Pos());
+
     quad->Draw();
 }
 
@@ -464,4 +470,6 @@ void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
     rtSym("ApplyLightForQuad%light%model", ApplyLightForQuad);
 
     rtSym("SetModelAttrib%model#m#r", SetModelAttrib);
+    rtSym("SetCubeAttrib%cube#m#r", SetCubeAttrib);
+    rtSym("SetQuadAttrib%cube#m#r", SetQuadAttrib);
 }

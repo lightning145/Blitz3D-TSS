@@ -12,10 +12,10 @@ struct Vertex
     MD_Math::VECTOR3 Position;
     MD_Math::VECTOR3 Normals;
     MD_Math::VECTOR2 TexCoords;
-    MD_Math::VECTOR3 Tangent;   
-    MD_Math::VECTOR3 Bitangent; 
-    MD_Math::IVECTOR4 BoneIDs;       
-    MD_Math::VECTOR4 Weights;    
+    MD_Math::VECTOR3 Tangent;
+    MD_Math::VECTOR3 Bitangent;
+    MD_Math::IVECTOR4 BoneIDs;
+    MD_Math::VECTOR4 Weights;
 };
 
 struct Texture {
@@ -23,6 +23,9 @@ struct Texture {
     std::string type;
     std::string path;
 };
+
+void ComputeTangents(std::vector<Vertex>& vertices,
+    const std::vector<unsigned int>& indices);
 
 class Mesh
 {
@@ -32,21 +35,18 @@ private:
     std::vector<Texture> textures;
     unsigned int ind;
 
-    void ComputeTangents(std::vector<Vertex>& vertices, 
-                      const std::vector<unsigned int>& indices);
-          
 public:
-    Mesh(){};
+    Mesh() {};
     /*
-    Mesh(std::vector<MD_Math::VECTOR3> pos, 
-        std::vector<MD_Math::VECTOR2> texc, 
+    Mesh(std::vector<MD_Math::VECTOR3> pos,
+        std::vector<MD_Math::VECTOR2> texc,
         std::vector<Texture> texs,
         std::vector<unsigned int> indices);*/
 
     Mesh(
         std::vector<Vertex> vers,
         std::vector<Texture> texs,
-        std::vector<unsigned int> indices);    
+        std::vector<unsigned int> indices);
 
     ~Mesh();
 

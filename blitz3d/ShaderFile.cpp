@@ -388,9 +388,9 @@ const char* Cube_fs =
 
 "void main()\n"
 "{\n"
-"    if(UseTex) {\n"
-"       ModelColor = texture(texture_diffuse0, TexCoords).rgb;\n"
-"     }\n"
+//"    if(UseTex) {\n"
+//"       ModelColor = texture(texture_diffuse0, TexCoords).rgb;\n"
+//"     }\n"
 
 "    if (Uselight) {\n"
 "       vec3 norm = vec3(1.0);\n"
