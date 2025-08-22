@@ -44,9 +44,9 @@ public:
     Shader modelShader;
 
     Model(){};
-    Model(std::string path)
+    Model(std::string path, const char* vs, const char* fs)
     {
-        modelShader = Shader(model_vs, model_fs);
+        modelShader = Shader(vs, fs);
         modelShader.Link();
         LoadModel(path);
     }

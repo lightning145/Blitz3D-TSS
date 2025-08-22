@@ -233,6 +233,7 @@ void ComputeTangents(std::vector<Vertex>& vertices,
 Cube::Cube(const char* vs, const char* fs)
 {
     shader = Shader(vs, fs);
+    shader.Link();
 
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -335,6 +336,7 @@ void Cube::Draw()
 Quad::Quad(const char* vs, const char* fs)
 {
     shader = Shader(vs, fs);
+    shader.Link();
 
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;

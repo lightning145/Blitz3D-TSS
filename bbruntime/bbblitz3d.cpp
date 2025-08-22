@@ -200,7 +200,7 @@ void PositionModel(Model* model, float x, float y, float z)
 //-------------------Model--------------------------
 Model* LoadModel(BBStr* modelpath)
 {
-    Model* model = new Model(modelpath->c_str());
+    Model* model = new Model(modelpath->c_str(), model_vs, model_fs);
     model->modelShader.Use();
     model->modelShader.SetMatrix("projection", projection);
     model->modelShader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
@@ -260,7 +260,6 @@ void FreeAnimation(Animator* animator)
 Cube* CreateCube()
 {
     Cube* cube = new Cube(Cube_vs, Cube_fs);
-    cube->shader.Link();
     cube->shader.Use();
     cube->shader.SetMatrix("projection", projection);
     cube->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
@@ -361,7 +360,6 @@ void ApplySkyBoxIBLForCube(IBL* ibl, Cube* model)
 Quad* CreateQuad()
 {
     Quad* quad = new Quad(Cube_vs, Cube_fs);
-    quad->shader.Link();
     quad->shader.Use();
     quad->shader.SetMatrix("projection", projection);
     quad->shader.SetMatrix("view", ViewMatrixRH(VECTOR3(0.0f, 0.0f, 1.0f), VECTOR3(0.0f, 0.0f, 0.0f), VECTOR3(0.0f, 1.0f, 0.0f)));
