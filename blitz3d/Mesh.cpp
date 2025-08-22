@@ -230,9 +230,9 @@ void ComputeTangents(std::vector<Vertex>& vertices,
     }
 }
 
-Cube::Cube(const char* vs, const char* fs)
+Cube::Cube(Shader s)
 {
-    shader = Shader(vs, fs);
+    shader = s;
     shader.Link();
 
     std::vector<Vertex> vertices;
@@ -333,9 +333,9 @@ void Cube::Draw()
     mesh.Draw(shader);
 }
 
-Quad::Quad(const char* vs, const char* fs)
+Quad::Quad(Shader s)
 {
-    shader = Shader(vs, fs);
+    shader = s;
     shader.Link();
 
     std::vector<Vertex> vertices;

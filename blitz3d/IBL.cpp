@@ -6,7 +6,8 @@ using namespace MD_Math;
 
 IBL::IBL(const char* hdrfile)
 {
-	Cube skybox = Cube(ToCubemap_vs, ToCubemap_fs);
+    Shader s_shader = Shader(ToCubemap_vs, ToCubemap_fs);
+	Cube skybox = Cube(s_shader);
 	skybox.shader.Link();
     glGenFramebuffers(1, &FBO);
     glGenRenderbuffers(1, &RBO);
@@ -76,7 +77,8 @@ IBL::IBL(const char* hdrfile)
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    FinalSkyBox = new Cube(SkyBox_vs, SkyBox_fs);
+    Shader f_shader = Shader(SkyBox_vs, SkyBox_fs);
+    FinalSkyBox = new Cube(f_shader);
     FinalSkyBox->shader.Link();
     FinalSkyBox->shader.Use();
     FinalSkyBox->shader.SetInt("equirectangularMap", 0);
@@ -86,7 +88,8 @@ IBL::IBL(const char* hdrfile)
 
     glDeleteTextures(1, &hdrTexture);
 
-    Cube irrCube = Cube(ToCubemap_vs, irradiance_fs);
+    Shader i_shader = Shader(ToCubemap_vs, irradiance_fs);
+    Cube irrCube = Cube(i_shader);
     irrCube.shader.Link();
 
     glGenTextures(1, &irradianceMap);
@@ -139,7 +142,8 @@ IBL::IBL(const char* hdrfile)
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    Cube prefilterCube = Cube(ToCubemap_vs, prefilter_fs);
+    Shader p_shader = Shader(ToCubemap_vs, prefilter_fs);
+    Cube prefilterCube = Cube(p_shader);
 
     prefilterCube.shader.Link();
     prefilterCube.shader.Use();
@@ -182,7 +186,8 @@ IBL::IBL(const char* hdrfile)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    Quad brdf_quad = Quad(brdf_vs, brdf_fs);
+    Shader b_shader = Shader(brdf_vs, brdf_fs);
+    Quad brdf_quad = Quad(b_shader);
     brdf_quad.shader.Link();
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);

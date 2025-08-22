@@ -63,7 +63,7 @@ private:
 public:
     Shader shader;
     Cube() {};
-    Cube(const char* vs, const char* fs);
+    Cube(Shader s);
     ~Cube();
 
     void Draw();
@@ -76,7 +76,7 @@ private:
 public:
     Shader shader;
     Quad() {};
-    Quad(const char* vs, const char* fs);
+    Quad(Shader s);
     ~Quad();
 
     void Draw();
