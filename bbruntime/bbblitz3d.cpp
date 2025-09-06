@@ -197,6 +197,18 @@ void PositionModel(Model* model, float x, float y, float z)
     model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f));
 }
 
+void ShadowModel(Model* model, PBR_Light* light,float x, float y, float z,
+                               float a, float b, float c, float d)
+{
+    PLANE plane(a, b, c, d);
+
+    model->modelShader.Use();
+    model->modelShader.SetVec3("LightColor", VECTOR3(0.0f, 0.0f, 0.0f));
+    model->modelShader.SetMatrix("model", TranslationMatrix(x, y, z) * ScaleMatrix(0.001f, 0.001f, 0.001f) * ShadowMatrix(
+        VECTOR4(light->Position.x, light->Position.y, light->Position.z, 1.0f),plane
+    ));
+}
+
 //-------------------Model--------------------------
 Model* LoadModel(BBStr* modelpath)
 {
@@ -421,6 +433,7 @@ bool blitz3d_destroy() {
 }
 
 void blitz3d_link(void (*rtSym)(const char* sym, void* pc)) {
+    rtSym("ShadowModel%m%l#x#y#z#a#b#c#d", ShadowModel);
     rtSym("%CreateSkyBoxIBL$hdr", CreateSkyBoxIBL);
     rtSym("DrawSkyBoxIBL%ibl", DrawSkyBoxIBL);
     rtSym("FreeSkyBoxIBL%ibl", FreeSkyBoxIBL);
