@@ -1,3 +1,5 @@
+#注!!!这个分支已被弃用
+
 # Blitz3D TSS
 
 This is a **fork** of [Blitz3D TSS](https://github.com/Saalvage/Blitz3D), made by [ZiYueCommentary](https://github.com/ZiYueCommentary/Blitz3D).
